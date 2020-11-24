@@ -35,11 +35,3 @@ impl UserRoleList {
         UserRoleList(result)
     }
 }
-
-
-// #[derive(Insertable)]
-// #[table_name = "user_role"]
-// pub struct NewUserRole<'a> {
-//     pub id: u8,
-//     pub description: &'a str
-// }

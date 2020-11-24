@@ -17,6 +17,7 @@ use config::connect;
 #[actix_web::main]
 async fn main() -> Result<()> {
     std::env::set_var("RUST_LOG", "actix_web=trace");
+
     // Start HTTP server
     HttpServer::new(|| {
         App::new()
