@@ -6,6 +6,7 @@ use diesel::{
 };
 
 use chrono::NaiveDateTime;
+use crate::error_handler::ElogError;
 
 use super::schema::expense;
 use super::schema::expense::dsl::*;
@@ -29,14 +30,11 @@ pub struct NewExpense {
 
 impl Expense {
 
-    pub fn insert(connection: &MysqlConnection, new_expense: NewExpense) {
-        let _insert = insert_into(expense)
+    pub fn insert(connection: &MysqlConnection, new_expense: NewExpense) -> Result<usize, ElogError> {
+        insert_into(expense)
             .values(&new_expense)
             .execute(connection)
-            .map_err(|error| {
-                println!("Error during insert expense: {:?}, {:?}", new_expense, error);
-                error
-            });
+            .map_err(|_| { ElogError::InsertFailure })
     }
 }
 

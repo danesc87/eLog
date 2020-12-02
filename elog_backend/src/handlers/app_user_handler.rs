@@ -1,5 +1,4 @@
 use actix_web::{
-    HttpRequest,
     HttpResponse,
     web,
     post
@@ -15,12 +14,17 @@ use crate::models::app_user::{
     NewAppUser
 };
 
+use crate::error_handler::ElogError;
+
 #[post("/register")]
-pub async fn register(request: HttpRequest, pool: web::Data<MySqlPool>, app_user: web::Json<NewAppUser>) -> HttpResponse {
-    println!("{:?}", request);
-    println!("{:?}", app_user);
+pub async fn register(
+    pool: web::Data<MySqlPool>,
+    app_user: web::Json<NewAppUser>
+) -> Result<HttpResponse, ElogError> {
     let connection = mysql_pool_handler(pool);
-    HttpResponse::Created().json(AppUser::register(&connection.unwrap(), app_user.0))
+    AppUser::register(&connection.unwrap(), app_user.0).map(|_| {
+        HttpResponse::Created().finish()
+    })
 }
 
 // Sample for Encoding and Decoding Strings with BASE64

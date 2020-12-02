@@ -16,13 +16,17 @@ use crate::models::pay_type::{
     PayTypeList
 };
 
+use crate::error_handler::ElogError;
+
 #[post("/pay_type")]
 pub async fn insert_pay_type (
     pool: web::Data<MySqlPool>,
     pay_type: web::Json<NewPayType>
-) -> HttpResponse {
+) -> Result<HttpResponse, ElogError> {
     let connection = mysql_pool_handler(pool);
-    HttpResponse::Created().json(PayType::insert(&connection.unwrap(), pay_type.0))
+    PayType::insert(&connection.unwrap(), pay_type.0).map(|_| {
+        HttpResponse::Created().finish()
+    })
 }
 
 #[get("/pay_type")]
