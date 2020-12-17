@@ -6,6 +6,7 @@ use diesel::{
 };
 
 use chrono::NaiveDateTime;
+use crate::error_handler::ElogError;
 
 use super::schema::user_pay_method;
 use super::schema::user_pay_method::dsl::*;
@@ -47,14 +48,11 @@ impl Default for NewUserPayMethod {
 
 impl UserPayMethod {
 
-    pub fn insert(connection: &MysqlConnection, new_user_pay_method: NewUserPayMethod) {
-        let _insert = insert_into(user_pay_method)
+    pub fn insert(connection: &MysqlConnection, new_user_pay_method: NewUserPayMethod) -> Result<usize, ElogError> {
+        insert_into(user_pay_method)
             .values(&new_user_pay_method)
             .execute(connection)
-            .map_err(|error| {
-                println!("Error during insert user pay method: {:?}, {:?}", new_user_pay_method, error);
-                error
-            });
+            .map_err(|_| { ElogError::InsertFailure })
     }
 }
 

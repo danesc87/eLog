@@ -4,6 +4,7 @@ use diesel::{
     insert_into,
     RunQueryDsl
 };
+use crate::error_handler::ElogError;
 
 use super::schema::pay_type;
 use super::schema::pay_type::dsl::*;
@@ -24,14 +25,11 @@ pub struct NewPayType {
 
 impl PayType {
 
-    pub fn insert(connection: &MysqlConnection, new_pay_type: NewPayType) {
-        let _insert = insert_into(pay_type)
+    pub fn insert(connection: &MysqlConnection, new_pay_type: NewPayType) -> Result<usize, ElogError>{
+        insert_into(pay_type)
             .values(&new_pay_type)
             .execute(connection)
-            .map_err(|error| {
-                println!("Error during insert Pay Type: {:?}, {:?}", new_pay_type, error);
-                error
-            });
+            .map_err(|_| { ElogError::InsertFailure })
     }
 }
 

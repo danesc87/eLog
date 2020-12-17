@@ -6,6 +6,7 @@ use diesel::{
 };
 
 use chrono::NaiveDateTime;
+use crate::error_handler::ElogError;
 
 use super::schema::app_user;
 use super::schema::app_user::dsl::*;
@@ -33,14 +34,10 @@ pub struct NewAppUser {
 
 impl AppUser {
 
-    pub fn register(connection: & MysqlConnection, new_user: NewAppUser) {
-
-        let _insert = insert_into(app_user)
+    pub fn register(connection: & MysqlConnection, new_user: NewAppUser) -> Result<usize, ElogError> {
+        insert_into(app_user)
             .values(&new_user)
             .execute(connection)
-            .map_err(|error| {
-                println!("Error during register user: {:?}, {:?}", new_user, error);
-                error
-            });
+            .map_err(|_| { ElogError::InsertFailure })
     }
 }

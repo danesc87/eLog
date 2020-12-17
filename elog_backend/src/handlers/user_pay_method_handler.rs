@@ -16,17 +16,21 @@ use crate::models::user_pay_method::{
     UserPayMethodList
 };
 
+use crate::error_handler::ElogError;
+
 #[post("/user_pay_method/{user_id}/{pay_type_id}")]
 pub async fn insert_user_pay_method (
     pool: web::Data<MySqlPool>,
     path: web::Path<(i16, i8)>,
     mut new_user_pay_method: web::Json<NewUserPayMethod>
-) -> HttpResponse {
+) -> Result<HttpResponse, ElogError>  {
     let connection = mysql_pool_handler(pool);
     let unwraped_path = path.into_inner();
     new_user_pay_method.user_id = unwraped_path.0;
     new_user_pay_method.pay_type_id = unwraped_path.1;
-    HttpResponse::Created().json(UserPayMethod::insert(&connection.unwrap(), new_user_pay_method.0))
+    UserPayMethod::insert(&connection.unwrap(), new_user_pay_method.0).map(|_| {
+        HttpResponse::Created().finish()
+    })
 }
 
 #[get("/user_pay_method")]
