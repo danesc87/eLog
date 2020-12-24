@@ -11,10 +11,11 @@ use crate::config::{
 
 use crate::models::app_user::{
     AppUser,
-    NewAppUser
+    NewAppUser,
+    LoginAppUser
 };
 
-use crate::error_handler::ElogError;
+use crate::error_mapper::ElogError;
 
 #[post("/register")]
 pub async fn register(
@@ -27,12 +28,13 @@ pub async fn register(
     })
 }
 
-// Sample for Encoding and Decoding Strings with BASE64
-
-// fn base64_stuff() {
-//     use data_encoding::BASE64;
-//
-//     let encoded = BASE64.encode(b"Hello world");
-//     println!("BASE64 encoded is {}", encoded);
-//     println!("BASE64 decoded is {:?}", String::from_utf8_lossy(&BASE64.decode(b"SGVsbG8gd29ybGQ=").unwrap()));
-// }
+#[post("/login")]
+pub async fn login(
+    pool: web::Data<MySqlPool>,
+    login_app_user: web::Json<LoginAppUser>,
+) -> Result<HttpResponse, ElogError> {
+    let connection = mysql_pool_handler(pool);
+    AppUser::login(&connection.unwrap(), login_app_user.0).map(|token| {
+        HttpResponse::Ok().json(token)
+    })
+}

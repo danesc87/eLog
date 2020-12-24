@@ -16,7 +16,7 @@ use crate::models::user_pay_method::{
     UserPayMethodList
 };
 
-use crate::error_handler::ElogError;
+use crate::error_mapper::ElogError;
 
 #[post("/user_pay_method/{user_id}/{pay_type_id}")]
 pub async fn insert_user_pay_method (

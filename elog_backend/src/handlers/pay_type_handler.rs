@@ -16,7 +16,7 @@ use crate::models::pay_type::{
     PayTypeList
 };
 
-use crate::error_handler::ElogError;
+use crate::error_mapper::ElogError;
 
 #[post("/pay_type")]
 pub async fn insert_pay_type (

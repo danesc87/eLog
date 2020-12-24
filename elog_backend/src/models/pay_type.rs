@@ -4,7 +4,7 @@ use diesel::{
     insert_into,
     RunQueryDsl
 };
-use crate::error_handler::ElogError;
+use crate::error_mapper::ElogError;
 
 use super::schema::pay_type;
 use super::schema::pay_type::dsl::*;

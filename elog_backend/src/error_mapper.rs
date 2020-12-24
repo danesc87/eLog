@@ -5,8 +5,10 @@ use actix_web::{HttpResponse, http::StatusCode, error::ResponseError};
 pub enum ElogError {
     #[fail(display="Bad Request")]
     InsertFailure,
-    #[fail(display="Operation Not Permitted")]
-    OperationNotPermitted,
+    #[fail(display="{} Not found", _0)]
+    ObjectNotFound(String),
+    #[fail(display="TokenCreationError")]
+    TokenCreationError,
 }
 
 impl ResponseError for ElogError {
@@ -15,9 +17,10 @@ impl ResponseError for ElogError {
             ElogError::InsertFailure => HttpResponse::new(
                 StatusCode::BAD_REQUEST
             ),
-            ElogError::OperationNotPermitted => HttpResponse::new(
-                StatusCode::FORBIDDEN
-            ),
+            ElogError::ObjectNotFound(ref message) => HttpResponse::NotFound()
+                .json(message),
+            ElogError::TokenCreationError => HttpResponse::InternalServerError()
+                .json("Token cannot be created"),
         }
     }
 }
