@@ -48,3 +48,9 @@ CREATE TABLE IF NOT EXISTS expense (
   PRIMARY KEY (id),
   FOREIGN KEY (user_pay_method_id) REFERENCES user_pay_method (id)
 );
+
+
+CREATE TABLE IF NOT EXISTS invalid_tokens (
+  string_token TEXT NOT NULL UNIQUE,
+  expiration_date TIMESTAMP NOT NULL
+);

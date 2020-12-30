@@ -46,7 +46,8 @@ pub fn route_config(config: &mut web::ServiceConfig) {
     use crate::handlers::{
         app_user_handler::{
             register,
-            login
+            login,
+            logout
         },
         pay_type_handler::{
             insert_pay_type,
@@ -65,6 +66,7 @@ pub fn route_config(config: &mut web::ServiceConfig) {
     config
         .service(register)
         .service(login)
+        .service(logout)
         .service(insert_pay_type)
         .service(get_all_pay_types)
         .service(insert_user_pay_method)

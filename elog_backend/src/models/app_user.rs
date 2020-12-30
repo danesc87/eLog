@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use actix_web::http::header::HeaderValue;
 use diesel::{
     MysqlConnection,
     QueryDsl,
@@ -43,7 +44,7 @@ pub struct LoginAppUser {
 }
 
 #[derive(Debug, Serialize)]
-pub struct LoggedAppUser {
+pub struct AppUserToken {
     pub token_type: String,
     pub access_token: String
 }
@@ -59,14 +60,26 @@ impl AppUser {
             .map_err(|_| { ElogError::InsertFailure })
     }
 
-    pub fn login(connection: &MysqlConnection, login_app_user: LoginAppUser) -> Result<LoggedAppUser, ElogError> {
+    pub fn login(connection: &MysqlConnection, login_app_user: LoginAppUser) -> Result<AppUserToken, ElogError> {
         use data_encoding::BASE64;
-        app_user
+        let logged_app_user = app_user
             .filter(username.eq(login_app_user.username.clone()))
             .filter(password.eq(BASE64.encode(login_app_user.password.as_bytes())))
             .first::<AppUser>(connection)
-            .map_err(|_| { ElogError::ObjectNotFound(login_app_user.username.clone()) })
-            .and_then(|_| { Claims::create_token(login_app_user) })
+            .map_err(|_| { ElogError::ObjectNotFound(login_app_user.username.clone()) });
+
+        logged_app_user.and_then(Claims::create_token)
+    }
+
+    pub fn logout(connection: &MysqlConnection, authorization_header: Option<&HeaderValue>) -> Result<usize, ElogError> {
+        match authorization_header {
+            Some(_) => {
+                let splitted_header_token: Vec<&str> = authorization_header.unwrap().to_str().unwrap().split("Bearer").collect();
+                let token = splitted_header_token[1].trim();
+                Claims::invalidate_token(connection, token)
+            }
+            None => Ok(0)
+        }
     }
 }
 

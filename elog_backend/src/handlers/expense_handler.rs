@@ -22,7 +22,8 @@ use crate::authentication::AuthorizationService;
 #[post("/expense")]
 pub async fn insert_expense (
     pool: web::Data<MySqlPool>,
-    new_expense: web::Json<NewExpense>
+    new_expense: web::Json<NewExpense>,
+    _: AuthorizationService
 ) -> Result<HttpResponse, ElogError> {
     let connection = mysql_pool_handler(pool);
     Expense::insert(&connection.unwrap(), new_expense.0).map(|_| {
