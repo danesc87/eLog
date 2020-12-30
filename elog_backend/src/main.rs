@@ -10,11 +10,13 @@ extern crate diesel;
 extern crate failure;
 
 mod config;
+mod authentication;
 mod handlers;
 mod models;
-mod error_handler;
+mod error_mapper;
 use config::route_config;
 use config::connect;
+use config::get_cors;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -24,8 +26,9 @@ async fn main() -> std::io::Result<()> {
     // Start HTTP server
     HttpServer::new(|| {
         App::new()
-            .data(connect())
             .wrap(Logger::default())
+            .wrap(get_cors())
+            .data(connect())
             .configure(route_config)
     })
     .bind("127.0.0.1:8090")?

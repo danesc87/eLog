@@ -2,6 +2,7 @@ use actix_web::{
     HttpResponse,
     web
 };
+use actix_cors::Cors;
 use diesel::mysql::MysqlConnection;
 use diesel::r2d2::{
     ConnectionManager,
@@ -31,11 +32,23 @@ pub fn mysql_pool_handler(pool: web::Data<MySqlPool>) -> Result<MySqlPooledConne
         .map_err(|e| HttpResponse::InternalServerError().json(e.to_string()))
 }
 
+pub fn get_cors() -> Cors {
+    Cors::permissive().max_age(3600)
+}
+
+pub fn get_secret_key() -> String {
+    std::env::var("JWT_SECRET").unwrap_or("my-super-secret-key-for-elog-manager".into())
+}
+
 // Endpoints registration config
 pub fn route_config(config: &mut web::ServiceConfig) {
     // Only imports of Endpoints
     use crate::handlers::{
-        app_user_handler::register,
+        app_user_handler::{
+            register,
+            login,
+            logout
+        },
         pay_type_handler::{
             insert_pay_type,
             get_all_pay_types
@@ -50,7 +63,10 @@ pub fn route_config(config: &mut web::ServiceConfig) {
         }
     };
 
-    config.service(register)
+    config
+        .service(register)
+        .service(login)
+        .service(logout)
         .service(insert_pay_type)
         .service(get_all_pay_types)
         .service(insert_user_pay_method)

@@ -6,7 +6,7 @@ use diesel::{
 };
 
 use chrono::NaiveDateTime;
-use crate::error_handler::ElogError;
+use crate::error_mapper::ElogError;
 
 use super::schema::user_pay_method;
 use super::schema::user_pay_method::dsl::*;

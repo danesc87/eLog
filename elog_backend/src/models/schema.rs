@@ -46,3 +46,10 @@ table! {
         register_at -> Timestamp,
     }
 }
+
+table! {
+    invalid_tokens (string_token) {
+        string_token -> Text,
+        expiration_date -> Timestamp,
+    }
+}

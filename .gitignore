@@ -14,3 +14,7 @@
 *dist
 *.DS_Store
 *.local
+
+# Atom/VsCode configs and debuggers
+*.atom-dbg.cson
+*.vscode

@@ -16,12 +16,14 @@ use crate::models::expense::{
     ExpenseList
 };
 
-use crate::error_handler::ElogError;
+use crate::error_mapper::ElogError;
+use crate::authentication::AuthorizationService;
 
 #[post("/expense")]
 pub async fn insert_expense (
     pool: web::Data<MySqlPool>,
-    new_expense: web::Json<NewExpense>
+    new_expense: web::Json<NewExpense>,
+    _: AuthorizationService
 ) -> Result<HttpResponse, ElogError> {
     let connection = mysql_pool_handler(pool);
     Expense::insert(&connection.unwrap(), new_expense.0).map(|_| {
@@ -30,7 +32,10 @@ pub async fn insert_expense (
 }
 
 #[get("/expense")]
-pub async fn get_all_expenses(pool: web::Data<MySqlPool>) -> HttpResponse {
+pub async fn get_all_expenses(
+    pool: web::Data<MySqlPool>,
+    _: AuthorizationService
+) -> HttpResponse {
     let connection = mysql_pool_handler(pool);
     HttpResponse::Ok().json(ExpenseList::get_list(&connection.unwrap()))
 }

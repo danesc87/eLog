@@ -1,6 +1,8 @@
 use actix_web::{
     HttpResponse,
+    HttpRequest,
     web,
+    get,
     post
 };
 
@@ -11,10 +13,12 @@ use crate::config::{
 
 use crate::models::app_user::{
     AppUser,
-    NewAppUser
+    NewAppUser,
+    LoginAppUser
 };
 
-use crate::error_handler::ElogError;
+use crate::error_mapper::ElogError;
+use crate::authentication::AuthorizationService;
 
 #[post("/register")]
 pub async fn register(
@@ -27,12 +31,26 @@ pub async fn register(
     })
 }
 
-// Sample for Encoding and Decoding Strings with BASE64
+#[post("/login")]
+pub async fn login(
+    pool: web::Data<MySqlPool>,
+    login_app_user: web::Json<LoginAppUser>,
+) -> Result<HttpResponse, ElogError> {
+    let connection = mysql_pool_handler(pool);
+    AppUser::login(&connection.unwrap(), login_app_user.0).map(|token| {
+        HttpResponse::Ok().json(token)
+    })
+}
 
-// fn base64_stuff() {
-//     use data_encoding::BASE64;
-//
-//     let encoded = BASE64.encode(b"Hello world");
-//     println!("BASE64 encoded is {}", encoded);
-//     println!("BASE64 decoded is {:?}", String::from_utf8_lossy(&BASE64.decode(b"SGVsbG8gd29ybGQ=").unwrap()));
-// }
+#[get("/logout")]
+pub async fn logout(
+    pool: web::Data<MySqlPool>,
+    http_request: HttpRequest,
+    _: AuthorizationService
+) -> Result<HttpResponse, ElogError> {
+    let connection = mysql_pool_handler(pool);
+    let authorization_header = http_request.headers().get("Authorization");
+    AppUser::logout(&connection.unwrap(), authorization_header).map(|_| {
+        HttpResponse::Ok().finish()
+    })
+}
