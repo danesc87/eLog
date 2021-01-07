@@ -1,4 +1,5 @@
 use actix_web::{
+    HttpRequest,
     HttpResponse,
     web,
     get,
@@ -13,6 +14,7 @@ use crate::models::app_user::{
     NewAppUser,
     LoginAppUser
 };
+use crate::models::session_properties::SessionProperties;
 
 use crate::error_mapper::ElogError;
 use crate::authentication::AuthenticatedRequest;
@@ -47,4 +49,23 @@ pub async fn logout(authenticated_request: AuthenticatedRequest) -> Result<HttpR
     ).map(|_| {
         HttpResponse::Ok().finish()
     })
+}
+
+#[get("/session_properties")]
+pub async fn session_properties(
+    pool: web::Data<MySqlPool>,
+    http_request: HttpRequest
+) -> HttpResponse {
+    let auth = http_request.headers().get("Authorization");
+    match auth {
+        Some(_) => {
+            let splitted_header_token: Vec<&str> = auth.unwrap().to_str().unwrap().split("Bearer").collect();
+            let token = splitted_header_token[1].trim();
+            let connection = mysql_pool_handler(Some(&pool));
+            HttpResponse::Ok().json(
+                SessionProperties::get_session_properties(&connection.unwrap(), token)
+            )
+        },
+        None => HttpResponse::Ok().json(SessionProperties::no_token_session_properties())
+    }
 }

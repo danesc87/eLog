@@ -50,7 +50,8 @@ pub fn route_config(config: &mut web::ServiceConfig) {
         app_user_handler::{
             register,
             login,
-            logout
+            logout,
+            session_properties
         },
         pay_type_handler::{
             insert_pay_type,
@@ -70,6 +71,7 @@ pub fn route_config(config: &mut web::ServiceConfig) {
         .service(register)
         .service(login)
         .service(logout)
+        .service(session_properties)
         .service(insert_pay_type)
         .service(get_all_pay_types)
         .service(insert_user_pay_method)
