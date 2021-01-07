@@ -2,7 +2,9 @@ use serde::{Deserialize, Serialize};
 use diesel::{
     MysqlConnection,
     insert_into,
-    RunQueryDsl
+    QueryDsl,
+    RunQueryDsl,
+    ExpressionMethods
 };
 
 use chrono::NaiveDateTime;
@@ -54,19 +56,11 @@ impl UserPayMethod {
             .execute(connection)
             .map_err(|_| { ElogError::InsertFailure })
     }
-}
 
-
-#[derive(Serialize, Deserialize)]
-pub struct UserPayMethodList(pub Vec<UserPayMethod>);
-
-impl UserPayMethodList {
-
-    pub fn get_list(connection: &MysqlConnection) -> Self {
-        let user_pay_methods = user_pay_method
+    pub fn get_list(connection: &MysqlConnection, logged_user_id: i16) -> Result<Vec<UserPayMethod>, ElogError> {
+        user_pay_method
+            .filter(user_id.eq(logged_user_id))
             .load::<UserPayMethod>(connection)
-            .expect("Error during retrieving User Pay Methods");
-
-        UserPayMethodList(user_pay_methods)
+            .map_err(|_| { ElogError::ObjectNotFound(logged_user_id.to_string()) })
     }
 }

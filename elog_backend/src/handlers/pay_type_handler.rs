@@ -15,8 +15,8 @@ use crate::authentication::AuthenticatedRequest;
 
 #[post("/pay_type")]
 pub async fn insert_pay_type (
-    pay_type: web::Json<NewPayType>,
-    authenticated_request: AuthenticatedRequest
+    authenticated_request: AuthenticatedRequest,
+    pay_type: web::Json<NewPayType>
 ) -> Result<HttpResponse, ElogError> {
     PayType::insert(&authenticated_request.connection, pay_type.0).map(|_| {
         HttpResponse::Created().finish()
