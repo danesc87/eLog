@@ -4,12 +4,6 @@ use actix_web::{
     get,
     post
 };
-
-use crate::config::{
-    MySqlPool,
-    mysql_pool_handler
-};
-
 use crate::models::expense::{
     Expense,
     NewExpense,
@@ -17,25 +11,19 @@ use crate::models::expense::{
 };
 
 use crate::error_mapper::ElogError;
-use crate::authentication::AuthorizationService;
+use crate::authentication::AuthenticatedRequest;
 
 #[post("/expense")]
 pub async fn insert_expense (
-    pool: web::Data<MySqlPool>,
     new_expense: web::Json<NewExpense>,
-    _: AuthorizationService
+    authenticated_request: AuthenticatedRequest
 ) -> Result<HttpResponse, ElogError> {
-    let connection = mysql_pool_handler(pool);
-    Expense::insert(&connection.unwrap(), new_expense.0).map(|_| {
+    Expense::insert(&authenticated_request.connection, new_expense.0).map(|_| {
         HttpResponse::Created().finish()
     })
 }
 
 #[get("/expense")]
-pub async fn get_all_expenses(
-    pool: web::Data<MySqlPool>,
-    _: AuthorizationService
-) -> HttpResponse {
-    let connection = mysql_pool_handler(pool);
-    HttpResponse::Ok().json(ExpenseList::get_list(&connection.unwrap()))
+pub async fn get_all_expenses(authenticated_request: AuthenticatedRequest) -> HttpResponse {
+    HttpResponse::Ok().json(ExpenseList::get_list(&authenticated_request.connection))
 }

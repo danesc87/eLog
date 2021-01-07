@@ -1,5 +1,4 @@
 use serde::{Deserialize, Serialize};
-use actix_web::http::header::HeaderValue;
 use diesel::{
     MysqlConnection,
     QueryDsl,
@@ -71,15 +70,8 @@ impl AppUser {
         logged_app_user.and_then(Claims::create_token)
     }
 
-    pub fn logout(connection: &MysqlConnection, authorization_header: Option<&HeaderValue>) -> Result<usize, ElogError> {
-        match authorization_header {
-            Some(_) => {
-                let splitted_header_token: Vec<&str> = authorization_header.unwrap().to_str().unwrap().split("Bearer").collect();
-                let token = splitted_header_token[1].trim();
-                Claims::invalidate_token(connection, token)
-            }
-            None => Ok(0)
-        }
+    pub fn logout(connection: &MysqlConnection, string_token: &str) -> Result<usize, ElogError> {
+        Claims::invalidate_token(connection, string_token)
     }
 }
 

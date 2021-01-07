@@ -30,7 +30,7 @@ use crate::error_mapper::ElogError;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Claims {
-    id: i16,
+    pub id: i16,
     username: String,
     exp: i64
 }
@@ -68,17 +68,17 @@ impl Claims {
         }
     }
 
-    //todo!(This function should be used with auth middleware to check if token was stored on blacklisted tokens)
-    pub fn _is_invalid_token(connection: &MysqlConnection, token: &str) -> bool {
+    pub fn is_valid_token(connection: &MysqlConnection, token: &str) -> bool {
         let invalid_token = invalid_tokens
             .filter(string_token.eq(token.clone().to_owned()))
             .select(string_token)
             .first::<String>(connection)
             .map_err(|_| { ElogError::ObjectNotFound(token.clone().to_owned()) });
 
+        // Returns upside down, if we found a token on DB means is an invalid one
         match invalid_token {
-            Ok(_) => true,
-            Err(_) => false
+            Ok(_) => false,
+            Err(_) => true
         }
     }
 
