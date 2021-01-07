@@ -1,30 +1,25 @@
 use actix_web::{
-    HttpRequest,
     HttpResponse,
     web,
     get
 };
-
-use crate::config::{
-    MySqlPool,
-    mysql_pool_handler
-};
-
 use crate::models::user_role::{
     UserRole,
     UserRoleList
 };
 
+use crate::error_mapper::ElogError;
+use crate::authentication::AuthenticatedRequest;
+
 #[get("/user_roles")]
-pub async fn get_user_roles(request: HttpRequest, pool: web::Data<MySqlPool>) -> HttpResponse {
-    println!("{:?}", request);
-    let connection = mysql_pool_handler(pool);
-    HttpResponse::Ok().json(UserRoleList::list(&connection.unwrap()))
+pub async fn get_user_roles(authenticated_request: AuthenticatedRequest) -> Result<HttpResponse, ElogError> {
+    Ok(HttpResponse::Ok().json(UserRoleList::list(&authenticated_request.connection)))
 }
 
 #[get("/user_roles/{id}")]
-pub async fn get_user_role_with_id(request: HttpRequest, pool: web::Data<MySqlPool>, path: web::Path<(i8,)>) -> HttpResponse {
-    println!("{:?}", request);
-    let connection = mysql_pool_handler(pool);
-    HttpResponse::Ok().json(UserRole::get_with_id(&connection.unwrap(), path.into_inner().0))
+pub async fn get_user_role_with_id(
+    authenticated_request: AuthenticatedRequest,
+    path: web::Path<(i8,)>
+) -> Result<HttpResponse, ElogError> {
+    Ok(HttpResponse::Ok().json(UserRole::get_with_id(&authenticated_request.connection, path.into_inner().0)))
 }

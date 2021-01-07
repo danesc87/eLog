@@ -4,38 +4,35 @@ use actix_web::{
     get,
     post
 };
-
-use crate::config::{
-    MySqlPool,
-    mysql_pool_handler
-};
-
 use crate::models::expense::{
     Expense,
-    NewExpense,
-    ExpenseList
+    NewExpense
 };
 
 use crate::error_mapper::ElogError;
-use crate::authentication::AuthorizationService;
+use crate::authentication::AuthenticatedRequest;
 
-#[post("/expense")]
+#[post("/expense/{user_pay_method_id}")]
 pub async fn insert_expense (
-    pool: web::Data<MySqlPool>,
-    new_expense: web::Json<NewExpense>,
-    _: AuthorizationService
+    authenticated_request: AuthenticatedRequest,
+    dynamic_path: web::Path<(i8,)>,
+    mut new_expense: web::Json<NewExpense>
 ) -> Result<HttpResponse, ElogError> {
-    let connection = mysql_pool_handler(pool);
-    Expense::insert(&connection.unwrap(), new_expense.0).map(|_| {
+    new_expense.user_pay_method_id = dynamic_path.into_inner().0;
+    Expense::insert(
+        &authenticated_request.connection,
+        new_expense.0
+    ).map(|_| {
         HttpResponse::Created().finish()
     })
 }
 
 #[get("/expense")]
-pub async fn get_all_expenses(
-    pool: web::Data<MySqlPool>,
-    _: AuthorizationService
-) -> HttpResponse {
-    let connection = mysql_pool_handler(pool);
-    HttpResponse::Ok().json(ExpenseList::get_list(&connection.unwrap()))
+pub async fn get_all_expenses(authenticated_request: AuthenticatedRequest) -> Result<HttpResponse, ElogError> {
+    Expense::get_list(
+        &authenticated_request.connection,
+        authenticated_request.user_id
+    ).map(|list| {
+        HttpResponse::Ok().json(list)
+    })
 }

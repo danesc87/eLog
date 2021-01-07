@@ -97,7 +97,28 @@ Response
 Only 200 without body
 ```
 
+#### session_properties
 
+Request
+
+```
+path: /session_properties
+method: GET
+headers: Bearer token or not Token
+```
+
+Response
+
+Always Ok with following body
+
+```
+{
+  "is_valid_token": false,
+  "properties": null
+}
+```
+> `properties` will be null if no token was provided or token is expired.
+> only will have data if token is valid and user has properties
 
 #### insert_pay_type
 
@@ -145,7 +166,7 @@ Response
 Request
 
 ```
-path: /user_pay_method/{user_id}/{pay_type_id}
+path: /user_pay_method/{pay_type_id}
 method: POST
 headers: Bearer token
 ```
@@ -191,7 +212,7 @@ Response
 Request
 
 ```
-path: /expense
+path: /expense/{user_pay_method_id}
 method: POST
 headers: Bearer token
 ```
@@ -200,7 +221,6 @@ Body
 
 ```json
 {
-	"user_pay_method_id": 5,
 	"ammount": 40.6,
 	"description": "Whisky"
 }

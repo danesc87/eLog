@@ -2,7 +2,9 @@ use serde::{Deserialize, Serialize};
 use diesel::{
     MysqlConnection,
     insert_into,
-    RunQueryDsl
+    QueryDsl,
+    RunQueryDsl,
+    ExpressionMethods
 };
 
 use chrono::NaiveDateTime;
@@ -21,11 +23,23 @@ pub struct Expense {
 }
 
 #[derive(Debug, Insertable, Serialize, Deserialize)]
+#[serde(default)]
 #[table_name = "expense"]
 pub struct NewExpense {
     pub user_pay_method_id: i8,
     pub ammount: f64,
     pub description: String
+}
+
+// Default implementation lets send JSON body without user_pay_method_id
+impl Default for NewExpense {
+    fn default() -> Self {
+        NewExpense {
+            user_pay_method_id: 0,
+            ammount: 0.0,
+            description: String::from("")
+        }
+    }
 }
 
 impl Expense {
@@ -36,18 +50,23 @@ impl Expense {
             .execute(connection)
             .map_err(|_| { ElogError::InsertFailure })
     }
-}
 
-#[derive(Serialize, Deserialize)]
-pub struct ExpenseList(pub Vec<Expense>);
+    pub fn get_list(connection: &MysqlConnection, logged_user_id: i16) -> Result<Vec<Expense>, ElogError> {
+        use super::schema::user_pay_method::dsl::*;
+        let current_user_pay_method_id = user_pay_method
+            .filter(user_id.eq(logged_user_id))
+            .select(id)
+            .first::<i8>(connection)
+            .map_err(|_| { ElogError::ObjectNotFound(logged_user_id.to_string()) });
 
-impl ExpenseList {
-
-    pub fn get_list(connection: &MysqlConnection) -> Self {
-        let expenses = expense
-            .load::<Expense>(connection)
-            .expect("Error during retrieving expenses");
-
-        ExpenseList(expenses)
+        match current_user_pay_method_id {
+            Ok(method_id) => {
+                expense
+                    .filter(user_pay_method_id.eq(method_id))
+                    .load::<Expense>(connection)
+                    .map_err(|_| { ElogError::ObjectNotFound(logged_user_id.to_string()) })
+            },
+            Err(error) => Err(error),
+        }
     }
 }

@@ -4,42 +4,36 @@ use actix_web::{
     get,
     post
 };
-
-use crate::config::{
-    MySqlPool,
-    mysql_pool_handler
-};
-
 use crate::models::user_pay_method::{
     UserPayMethod,
-    NewUserPayMethod,
-    UserPayMethodList
+    NewUserPayMethod
 };
 
 use crate::error_mapper::ElogError;
-use crate::authentication::AuthorizationService;
+use crate::authentication::AuthenticatedRequest;
 
-#[post("/user_pay_method/{user_id}/{pay_type_id}")]
+#[post("/user_pay_method/{pay_type_id}")]
 pub async fn insert_user_pay_method (
-    pool: web::Data<MySqlPool>,
-    path: web::Path<(i16, i8)>,
-    mut new_user_pay_method: web::Json<NewUserPayMethod>,
-    _: AuthorizationService
+    authenticated_request: AuthenticatedRequest,
+    dynamic_path: web::Path<(i8,)>,
+    mut new_user_pay_method: web::Json<NewUserPayMethod>
 ) -> Result<HttpResponse, ElogError>  {
-    let connection = mysql_pool_handler(pool);
-    let unwraped_path = path.into_inner();
-    new_user_pay_method.user_id = unwraped_path.0;
-    new_user_pay_method.pay_type_id = unwraped_path.1;
-    UserPayMethod::insert(&connection.unwrap(), new_user_pay_method.0).map(|_| {
+    new_user_pay_method.user_id = authenticated_request.user_id;
+    new_user_pay_method.pay_type_id = dynamic_path.into_inner().0;
+    UserPayMethod::insert(
+        &authenticated_request.connection,
+        new_user_pay_method.0
+     ).map(|_| {
         HttpResponse::Created().finish()
     })
 }
 
 #[get("/user_pay_method")]
-pub async fn get_all_user_pay_methods(
-    pool: web::Data<MySqlPool>,
-    _: AuthorizationService
-) -> HttpResponse {
-    let connection = mysql_pool_handler(pool);
-    HttpResponse::Ok().json(UserPayMethodList::get_list(&connection.unwrap()))
+pub async fn get_all_user_pay_methods(authenticated_request: AuthenticatedRequest) -> Result<HttpResponse, ElogError> {
+    UserPayMethod::get_list(
+        &authenticated_request.connection,
+        authenticated_request.user_id
+    ).map(|list| {
+        HttpResponse::Ok().json(list)
+    })
 }
