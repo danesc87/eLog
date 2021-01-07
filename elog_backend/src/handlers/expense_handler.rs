@@ -9,7 +9,7 @@ use crate::models::expense::{
     NewExpense
 };
 
-use crate::error_mapper::ElogError;
+use crate::utils::error_mapper::ElogError;
 use crate::authentication::AuthenticatedRequest;
 
 #[post("/expense/{user_pay_method_id}")]

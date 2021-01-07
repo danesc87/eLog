@@ -13,10 +13,10 @@ mod config;
 mod authentication;
 mod handlers;
 mod models;
-mod error_mapper;
+mod utils;
 use config::route_config;
-use config::connect;
 use config::get_cors;
+use utils::database_utils::connect_database;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -28,7 +28,7 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .wrap(Logger::default())
             .wrap(get_cors())
-            .data(connect())
+            .data(connect_database())
             .configure(route_config)
     })
     .bind("127.0.0.1:8090")?

@@ -6,11 +6,10 @@ use actix_web::{
 };
 use crate::models::pay_type::{
     PayType,
-    NewPayType,
-    PayTypeList
+    NewPayType
 };
 
-use crate::error_mapper::ElogError;
+use crate::utils::error_mapper::ElogError;
 use crate::authentication::AuthenticatedRequest;
 
 #[post("/pay_type")]
@@ -25,5 +24,5 @@ pub async fn insert_pay_type (
 
 #[get("/pay_type")]
 pub async fn get_all_pay_types(authenticated_request: AuthenticatedRequest) -> HttpResponse {
-    HttpResponse::Ok().json(PayTypeList::get_list(&authenticated_request.connection))
+    HttpResponse::Ok().json(PayType::get_list(&authenticated_request.connection))
 }

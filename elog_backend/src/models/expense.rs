@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
+use crate::utils::database_utils::SqlConnection;
 use diesel::{
-    MysqlConnection,
     insert_into,
     QueryDsl,
     RunQueryDsl,
@@ -8,7 +8,7 @@ use diesel::{
 };
 
 use chrono::NaiveDateTime;
-use crate::error_mapper::ElogError;
+use crate::utils::error_mapper::ElogError;
 
 use super::schema::expense;
 use super::schema::expense::dsl::*;
@@ -44,14 +44,14 @@ impl Default for NewExpense {
 
 impl Expense {
 
-    pub fn insert(connection: &MysqlConnection, new_expense: NewExpense) -> Result<usize, ElogError> {
+    pub fn insert(connection: &SqlConnection, new_expense: NewExpense) -> Result<usize, ElogError> {
         insert_into(expense)
             .values(&new_expense)
             .execute(connection)
-            .map_err(|_| { ElogError::InsertFailure })
+            .map_err(|error| { ElogError::InsertFailure(error.to_string()) })
     }
 
-    pub fn get_list(connection: &MysqlConnection, logged_user_id: i16) -> Result<Vec<Expense>, ElogError> {
+    pub fn get_list(connection: &SqlConnection, logged_user_id: i16) -> Result<Vec<Expense>, ElogError> {
         use super::schema::user_pay_method::dsl::*;
         let current_user_pay_method_id = user_pay_method
             .filter(user_id.eq(logged_user_id))
