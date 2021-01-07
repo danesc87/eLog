@@ -3,6 +3,5 @@ Small App that handle an expense log to help you track how you manage your expen
 
 This repo contains frontend and backend as well in different folders, so you can them in:
 
-- [Frontend](frontend/)
-- [Backend](backend/)
-
+- [Frontend](elog_frontend/)
+- [Backend](elog_backend/)
