@@ -8,7 +8,7 @@ lazy_static! {
             ("SERVER_IP","0.0.0.0"),
             ("SERVER_PORT", "8090"),
             ("RUST_LOG", "actix_web=debug"),
-            ("DB_URL", "mysql://root:1234abcd@127.0.0.1:3306/elog"),
+            ("DB_URL", "mysql://user:pass@ip:port/db_name"),
             ("POOL_SIZE", "6"),
             ("JWT_SECRET", "elog-super-secret-key"),
             ("TOKEN_DURATION_MIN", "60"),
