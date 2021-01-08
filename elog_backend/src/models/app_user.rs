@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
+use crate::utils::database_utils::SqlConnection;
 use diesel::{
-    MysqlConnection,
     QueryDsl,
     insert_into,
     RunQueryDsl,
@@ -9,7 +9,7 @@ use diesel::{
 
 use chrono::NaiveDateTime;
 use super::token::Claims;
-use crate::error_mapper::ElogError;
+use crate::utils::error_mapper::ElogError;
 
 use super::schema::app_user;
 use super::schema::app_user::dsl::*;
@@ -50,16 +50,16 @@ pub struct AppUserToken {
 
 impl AppUser {
 
-    pub fn register(connection: &MysqlConnection, mut new_user: NewAppUser) -> Result<usize, ElogError> {
+    pub fn register(connection: &SqlConnection, mut new_user: NewAppUser) -> Result<usize, ElogError> {
         use data_encoding::BASE64;
         new_user.password = BASE64.encode(new_user.password.as_bytes());
         insert_into(app_user)
             .values(&new_user)
             .execute(connection)
-            .map_err(|_| { ElogError::InsertFailure })
+            .map_err(|error| { ElogError::InsertFailure(error.to_string()) })
     }
 
-    pub fn login(connection: &MysqlConnection, login_app_user: LoginAppUser) -> Result<AppUserToken, ElogError> {
+    pub fn login(connection: &SqlConnection, login_app_user: LoginAppUser) -> Result<AppUserToken, ElogError> {
         use data_encoding::BASE64;
         let logged_app_user = app_user
             .filter(username.eq(login_app_user.username.clone()))
@@ -70,7 +70,7 @@ impl AppUser {
         logged_app_user.and_then(Claims::create_token)
     }
 
-    pub fn logout(connection: &MysqlConnection, string_token: &str) -> Result<usize, ElogError> {
+    pub fn logout(connection: &SqlConnection, string_token: &str) -> Result<usize, ElogError> {
         Claims::invalidate_token(connection, string_token)
     }
 }

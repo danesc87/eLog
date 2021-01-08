@@ -4,8 +4,8 @@ use chrono::{
     Duration
 };
 use super::app_user::{AppUser, AppUserToken};
+use crate::utils::database_utils::SqlConnection;
 use diesel::{
-    MysqlConnection,
     QueryDsl,
     insert_into,
     RunQueryDsl,
@@ -24,9 +24,7 @@ use jsonwebtoken::{
 use super::schema::invalid_tokens;
 use super::schema::invalid_tokens::dsl::*;
 
-
-use crate::config::get_secret_key;
-use crate::error_mapper::ElogError;
+use crate::utils::error_mapper::ElogError;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Claims {
@@ -49,9 +47,9 @@ impl Claims {
         let token = encode(
             &Header::default(),
             &claims,
-            &EncodingKey::from_secret(get_secret_key().as_ref())
+            &EncodingKey::from_secret(Self::get_jwt_secret_key().as_bytes())
         )
-        .map_err(|_| { ElogError::TokenCreationError });
+        .map_err(|error| { ElogError::TokenCreationError(error.to_string()) });
         Ok(AppUserToken {
             token_type: "Bearer".into(),
             access_token: token.unwrap()
@@ -60,15 +58,16 @@ impl Claims {
 
     fn with_app_user(app_user: &AppUser) -> Self {
         use chrono::Local;
+        let token_duration = crate::utils::env_variable_utils::get_variable_as_integer("TOKEN_DURATION_MIN");
 
         Claims {
             id: app_user.id,
             username: app_user.username.to_owned(),
-            exp: (Local::now() + Duration::minutes(60)).timestamp()
+            exp: (Local::now() + Duration::minutes(token_duration.into())).timestamp()
         }
     }
 
-    pub fn is_valid_token(connection: &MysqlConnection, token: &str) -> bool {
+    pub fn is_valid_token(connection: &SqlConnection, token: &str) -> bool {
         let invalid_token = invalid_tokens
             .filter(string_token.eq(token.clone().to_owned()))
             .select(string_token)
@@ -85,12 +84,12 @@ impl Claims {
     pub fn decode_token(token: &str) -> Result<TokenData<Claims>, jsonwebtoken::errors::Error> {
         decode::<Claims>(
             token,
-            &DecodingKey::from_secret(get_secret_key().as_bytes()),
+            &DecodingKey::from_secret(Self::get_jwt_secret_key().as_bytes()),
             &Validation::new(Algorithm::HS256),
         )
     }
 
-    pub fn invalidate_token(connection: &MysqlConnection, token: &str) -> Result<usize, ElogError> {
+    pub fn invalidate_token(connection: &SqlConnection, token: &str) -> Result<usize, ElogError> {
         let claims_token = Self::decode_token(token).unwrap().claims;
         let exp_date = Duration::milliseconds(claims_token.exp);
         let invalid_token = InvalidToken {
@@ -101,6 +100,10 @@ impl Claims {
         insert_into(invalid_tokens)
             .values(&invalid_token)
             .execute(connection)
-            .map_err(|_| { ElogError::InsertFailure })
+            .map_err(|error| { ElogError::InsertFailure(error.to_string()) })
+    }
+
+    fn get_jwt_secret_key() -> String {
+        crate::utils::env_variable_utils::get_variable("JWT_SECRET")
     }
 }

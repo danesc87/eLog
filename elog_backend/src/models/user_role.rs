@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
+use crate::utils::database_utils::SqlConnection;
 use diesel::{
-    MysqlConnection,
     QueryDsl,
     RunQueryDsl,
     ExpressionMethods
@@ -15,7 +15,7 @@ pub struct UserRole {
 }
 
 impl UserRole {
-    pub fn get_with_id(connection: &MysqlConnection, role_id: i8) -> Self {
+    pub fn get_with_id(connection: &SqlConnection, role_id: i8) -> Self {
         user_role
             .filter(id.eq(role_id))
             .first::<UserRole>(connection)
@@ -27,7 +27,7 @@ impl UserRole {
 pub struct UserRoleList(pub Vec<UserRole>);
 
 impl UserRoleList {
-    pub fn list(connection: &MysqlConnection) -> Self {
+    pub fn list(connection: &SqlConnection) -> Self {
         let result = user_role
             .load::<UserRole>(connection)
             .expect("Error loading User Roles");

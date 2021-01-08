@@ -1,10 +1,10 @@
 use serde::{Deserialize, Serialize};
+use crate::utils::database_utils::SqlConnection;
 use diesel::{
-    MysqlConnection,
     insert_into,
     RunQueryDsl
 };
-use crate::error_mapper::ElogError;
+use crate::utils::error_mapper::ElogError;
 
 use super::schema::pay_type;
 use super::schema::pay_type::dsl::*;
@@ -25,24 +25,16 @@ pub struct NewPayType {
 
 impl PayType {
 
-    pub fn insert(connection: &MysqlConnection, new_pay_type: NewPayType) -> Result<usize, ElogError>{
+    pub fn insert(connection: &SqlConnection, new_pay_type: NewPayType) -> Result<usize, ElogError>{
         insert_into(pay_type)
             .values(&new_pay_type)
             .execute(connection)
-            .map_err(|_| { ElogError::InsertFailure })
+            .map_err(|error| { ElogError::InsertFailure(error.to_string()) })
     }
-}
 
-#[derive(Serialize, Deserialize)]
-pub struct PayTypeList(pub Vec<PayType>);
-
-impl PayTypeList {
-
-    pub fn get_list(connection: &MysqlConnection) -> Self {
-        let pay_types = pay_type
+    pub fn get_list(connection: &SqlConnection) -> Result<Vec<PayType>, ElogError> {
+        pay_type
             .load::<PayType>(connection)
-            .expect("Error during retrieving Pay Types");
-
-        PayTypeList(pay_types)
+            .map_err(|error| { ElogError::ErrorRetrievingData(error.to_string()) })
     }
 }

@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
-use diesel::MysqlConnection;
+use crate::utils::database_utils::SqlConnection;
 
 use super::token::Claims;
 
@@ -12,7 +12,7 @@ pub struct SessionProperties {
 
 impl SessionProperties {
 
-    pub fn get_session_properties(connection: &MysqlConnection, token: &str) -> Self {
+    pub fn get_session_properties(connection: &SqlConnection, token: &str) -> Self {
         let is_valid_token = Claims::is_valid_token(connection, token);
         if is_valid_token {
             //todo!(This HashMap should be mut when we start add properties)

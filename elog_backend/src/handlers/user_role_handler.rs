@@ -8,7 +8,7 @@ use crate::models::user_role::{
     UserRoleList
 };
 
-use crate::error_mapper::ElogError;
+use crate::utils::error_mapper::ElogError;
 use crate::authentication::AuthenticatedRequest;
 
 #[get("/user_roles")]

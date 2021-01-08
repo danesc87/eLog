@@ -5,9 +5,9 @@ use actix_web::{
     get,
     post
 };
-use crate::config::{
-    MySqlPool,
-    mysql_pool_handler
+use crate::utils::database_utils::{
+    SqlPool,
+    pool_handler
 };
 use crate::models::app_user::{
     AppUser,
@@ -16,15 +16,15 @@ use crate::models::app_user::{
 };
 use crate::models::session_properties::SessionProperties;
 
-use crate::error_mapper::ElogError;
+use crate::utils::error_mapper::ElogError;
 use crate::authentication::AuthenticatedRequest;
 
 #[post("/register")]
 pub async fn register(
-    pool: web::Data<MySqlPool>,
+    pool: web::Data<SqlPool>,
     app_user: web::Json<NewAppUser>
 ) -> Result<HttpResponse, ElogError> {
-    let connection = mysql_pool_handler(Some(&pool));
+    let connection = pool_handler(Some(&pool));
     AppUser::register(&connection.unwrap(), app_user.0).map(|_| {
         HttpResponse::Created().finish()
     })
@@ -32,10 +32,10 @@ pub async fn register(
 
 #[post("/login")]
 pub async fn login(
-    pool: web::Data<MySqlPool>,
+    pool: web::Data<SqlPool>,
     login_app_user: web::Json<LoginAppUser>,
 ) -> Result<HttpResponse, ElogError> {
-    let connection = mysql_pool_handler(Some(&pool));
+    let connection = pool_handler(Some(&pool));
     AppUser::login(&connection.unwrap(), login_app_user.0).map(|token| {
         HttpResponse::Ok().json(token)
     })
@@ -53,7 +53,7 @@ pub async fn logout(authenticated_request: AuthenticatedRequest) -> Result<HttpR
 
 #[get("/session_properties")]
 pub async fn session_properties(
-    pool: web::Data<MySqlPool>,
+    pool: web::Data<SqlPool>,
     http_request: HttpRequest
 ) -> HttpResponse {
     let auth = http_request.headers().get("Authorization");
@@ -61,7 +61,7 @@ pub async fn session_properties(
         Some(_) => {
             let splitted_header_token: Vec<&str> = auth.unwrap().to_str().unwrap().split("Bearer").collect();
             let token = splitted_header_token[1].trim();
-            let connection = mysql_pool_handler(Some(&pool));
+            let connection = pool_handler(Some(&pool));
             HttpResponse::Ok().json(
                 SessionProperties::get_session_properties(&connection.unwrap(), token)
             )

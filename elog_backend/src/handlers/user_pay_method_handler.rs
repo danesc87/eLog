@@ -9,7 +9,7 @@ use crate::models::user_pay_method::{
     NewUserPayMethod
 };
 
-use crate::error_mapper::ElogError;
+use crate::utils::error_mapper::ElogError;
 use crate::authentication::AuthenticatedRequest;
 
 #[post("/user_pay_method/{pay_type_id}")]

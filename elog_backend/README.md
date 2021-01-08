@@ -8,27 +8,47 @@ This repo contains the REST backend for **eLog** expenses manager. It's built up
 - Development Requirements
   - libmariadb-devel (openSUSE)
   - libmariadb-dev-compat (Ubuntu)
+- Env File
 
 ### Init MariaDB
 
 Running **MariaDB** inside docker
 
 ```bash
-docker run --name mariadb -e MYSQL_ROOT_PASSWORD=1234abcd -p 3306:3306 -d mariadb:10.5-focal
+docker run --name mariadb -e MYSQL_ROOT_PASSWORD={password} -p 3306:3306 -d mariadb:10.5-focal
 ```
 
 Create Database
 
 ```bash
 docker exec -it mariadb bash
-mysql -h 127.0.0.1 -u root -p1234abcd
+mysql -h 127.0.0.1 -u root -p{password}
 ```
 
 ```mysql
-CREATE DATABASE elog DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;
-GRANT ALL PRIVILEGES ON elog.* TO "root"@"localhost" IDENTIFIED BY "1234abcd";
+CREATE DATABASE {db_name} DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+GRANT ALL PRIVILEGES ON {db_name}.* TO "root"@"localhost" IDENTIFIED BY "1234abcd";
 ```
 
+
+### Env file
+
+`.env` file should be as follows:
+
+```
+# Server Things
+SERVER_IP=0.0.0.0
+SERVER_PORT=8090
+RUST_LOG=actix_web=debug
+
+# DB Data
+DB_URL=mysql://user:pass@ip:port/db_name
+POOL_SIZE=6
+
+# Token
+JWT_SECRET=elog-super-secret-key
+TOKEN_DURATION_MIN=60
+```
 
 ### Run
 
