@@ -10,27 +10,28 @@ use diesel::r2d2::{
     PooledConnection
 };
 
-// TODO This should be build based on "env" variables
-const DB_URL: &'static str = "mysql://root:1234abcd@127.0.0.1:3306/elog";
-
-// DB Config
+// DB Types.
+// If some user wants to change MySQL with PostgresSQL
+// Should only change SqlConnection type
 pub type SqlConnection = MysqlConnection;
 pub type SqlPool = Pool<ConnectionManager<SqlConnection>>;
 pub type SqlPooledConnection = PooledConnection<ConnectionManager<SqlConnection>>;
 
 pub fn connect_database() -> SqlPool {
-    init_database(DB_URL).expect("Error")
+    let db_url = super::env_variable_utils::get_variable("DB_URL");
+    init_database(db_url.as_str()).expect("Error during connection to Data Base!")
 }
 
 fn init_database(database_url: &str) -> Result<SqlPool, PoolError> {
     let manager = ConnectionManager::<SqlConnection>::new(database_url);
-    Pool::builder().max_size(6).build(manager)
+    let pool_size = super::env_variable_utils::get_variable_as_integer("POOL_SIZE");
+    Pool::builder().max_size(pool_size).build(manager)
 }
 
 pub fn pool_handler(connection_pool: Option<&web::Data<SqlPool>>) -> Result<SqlPooledConnection, HttpResponse> {
     connection_pool
-        .ok_or(HttpResponse::InternalServerError().json("No DB connection exists".to_owned()))
-        .and_then(|c| {
-             c.get().map_err(|e| HttpResponse::InternalServerError().json(e.to_string()))
+        .ok_or(HttpResponse::InternalServerError().json("No Data Base connection exists!".to_owned()))
+        .and_then(|pool| {
+             pool.get().map_err(|e| HttpResponse::InternalServerError().json(e.to_string()))
         })
 }

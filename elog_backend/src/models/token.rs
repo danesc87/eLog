@@ -24,8 +24,6 @@ use jsonwebtoken::{
 use super::schema::invalid_tokens;
 use super::schema::invalid_tokens::dsl::*;
 
-
-use crate::config::get_secret_key;
 use crate::utils::error_mapper::ElogError;
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -49,7 +47,7 @@ impl Claims {
         let token = encode(
             &Header::default(),
             &claims,
-            &EncodingKey::from_secret(get_secret_key().as_ref())
+            &EncodingKey::from_secret(Self::get_jwt_secret_key().as_bytes())
         )
         .map_err(|error| { ElogError::TokenCreationError(error.to_string()) });
         Ok(AppUserToken {
@@ -60,11 +58,12 @@ impl Claims {
 
     fn with_app_user(app_user: &AppUser) -> Self {
         use chrono::Local;
+        let token_duration = crate::utils::env_variable_utils::get_variable_as_integer("TOKEN_DURATION_MIN");
 
         Claims {
             id: app_user.id,
             username: app_user.username.to_owned(),
-            exp: (Local::now() + Duration::minutes(60)).timestamp()
+            exp: (Local::now() + Duration::minutes(token_duration.into())).timestamp()
         }
     }
 
@@ -85,7 +84,7 @@ impl Claims {
     pub fn decode_token(token: &str) -> Result<TokenData<Claims>, jsonwebtoken::errors::Error> {
         decode::<Claims>(
             token,
-            &DecodingKey::from_secret(get_secret_key().as_bytes()),
+            &DecodingKey::from_secret(Self::get_jwt_secret_key().as_bytes()),
             &Validation::new(Algorithm::HS256),
         )
     }
@@ -102,5 +101,9 @@ impl Claims {
             .values(&invalid_token)
             .execute(connection)
             .map_err(|error| { ElogError::InsertFailure(error.to_string()) })
+    }
+
+    fn get_jwt_secret_key() -> String {
+        crate::utils::env_variable_utils::get_variable("JWT_SECRET")
     }
 }

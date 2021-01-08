@@ -5,10 +5,6 @@ pub fn get_cors() -> Cors {
     Cors::permissive().max_age(3600)
 }
 
-pub fn get_secret_key() -> String {
-    std::env::var("JWT_SECRET").unwrap_or("my-super-secret-key-for-elog-manager".into())
-}
-
 // Endpoints registration config
 pub fn route_config(config: &mut web::ServiceConfig) {
     // Only imports of Endpoints
