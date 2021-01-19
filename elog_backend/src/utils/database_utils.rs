@@ -11,8 +11,8 @@ use diesel::r2d2::{
 };
 
 // DB Types.
-// If some user wants to change MySQL with PostgresSQL
-// Should only change SqlConnection type
+// If some user wants to change MySQL with PostgresSQL or SQLite
+// Should only change SqlConnection type and its import
 pub type SqlConnection = MysqlConnection;
 pub type SqlPool = Pool<ConnectionManager<SqlConnection>>;
 pub type SqlPooledConnection = PooledConnection<ConnectionManager<SqlConnection>>;
