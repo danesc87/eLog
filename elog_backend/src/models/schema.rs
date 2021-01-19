@@ -1,6 +1,6 @@
 table! {
     user_role (id) {
-        id -> TinyInt,
+        id -> SmallInt,
         description -> Varchar,
     }
 }
@@ -19,7 +19,7 @@ table! {
 
 table! {
     pay_type (id) {
-        id -> TinyInt,
+        id -> SmallInt,
         name -> Varchar,
         description -> Varchar,
     }
@@ -27,9 +27,9 @@ table! {
 
 table! {
     user_pay_method (id) {
-        id -> TinyInt,
+        id -> SmallInt,
         user_id -> SmallInt,
-        pay_type_id -> TinyInt,
+        pay_type_id -> SmallInt,
         bank_name -> Varchar,
         description -> Varchar,
         enabled -> Bool,
@@ -40,7 +40,7 @@ table! {
 table! {
     expense (id) {
         id -> Integer,
-        user_pay_method_id -> TinyInt,
+        user_pay_method_id -> SmallInt,
         ammount -> Double,
         description -> Varchar,
         register_at -> Timestamp,

@@ -15,7 +15,7 @@ use crate::authentication::AuthenticatedRequest;
 #[post("/user_pay_method/{pay_type_id}")]
 pub async fn insert_user_pay_method (
     authenticated_request: AuthenticatedRequest,
-    dynamic_path: web::Path<(i8,)>,
+    dynamic_path: web::Path<(i16,)>,
     mut new_user_pay_method: web::Json<NewUserPayMethod>
 ) -> Result<HttpResponse, ElogError>  {
     new_user_pay_method.user_id = authenticated_request.user_id;

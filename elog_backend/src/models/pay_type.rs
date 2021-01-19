@@ -11,7 +11,7 @@ use super::schema::pay_type::dsl::*;
 
 #[derive(Queryable, Serialize, Deserialize)]
 pub struct PayType {
-    pub id: i8,
+    pub id: i16,
     pub name: String,
     pub description: String
 }

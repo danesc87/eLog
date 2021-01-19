@@ -15,7 +15,7 @@ use crate::authentication::AuthenticatedRequest;
 #[post("/expense/{user_pay_method_id}")]
 pub async fn insert_expense (
     authenticated_request: AuthenticatedRequest,
-    dynamic_path: web::Path<(i8,)>,
+    dynamic_path: web::Path<(i16,)>,
     mut new_expense: web::Json<NewExpense>
 ) -> Result<HttpResponse, ElogError> {
     new_expense.user_pay_method_id = dynamic_path.into_inner().0;
