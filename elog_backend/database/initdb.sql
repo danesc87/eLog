@@ -3,7 +3,7 @@
 ---------------------------
 
 CREATE TABLE IF NOT EXISTS user_role (
-  id TINYINT NOT NULL,
+  id SMALLINT NOT NULL,
   description VARCHAR(25),
   PRIMARY KEY(id)
 );
@@ -20,16 +20,16 @@ CREATE TABLE IF NOT EXISTS app_user (
 );
 
 CREATE TABLE IF NOT EXISTS pay_type (
-  id TINYINT AUTO_INCREMENT,
+  id SMALLINT AUTO_INCREMENT,
   name VARCHAR(100) NOT NULL,
   description VARCHAR(255),
   PRIMARY KEY (id)
 );
 
 CREATE TABLE IF NOT EXISTS user_pay_method (
-  id TINYINT NOT NULL AUTO_INCREMENT,
+  id SMALLINT NOT NULL AUTO_INCREMENT,
   user_id SMALLINT NOT NULL,
-  pay_type_id TINYINT NOT NULL,
+  pay_type_id SMALLINT NOT NULL,
   bank_name VARCHAR(255) NOT NULL,
   description VARCHAR(255),
   enabled BOOLEAN NOT NULL DEFAULT 1,
@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS user_pay_method (
 
 CREATE TABLE IF NOT EXISTS expense (
   id INT NOT NULL AUTO_INCREMENT,
-  user_pay_method_id TINYINT NOT NULL,
+  user_pay_method_id SMALLINT NOT NULL,
   ammount DOUBLE(19,6),
   description VARCHAR(255),
   register_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,

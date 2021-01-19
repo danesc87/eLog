@@ -16,7 +16,7 @@ use super::schema::expense::dsl::*;
 #[derive(Queryable, Serialize, Deserialize)]
 pub struct Expense {
     pub id: i32,
-    pub user_pay_method_id: i8,
+    pub user_pay_method_id: i16,
     pub ammount: f64,
     pub description: String,
     pub register_date: NaiveDateTime
@@ -26,7 +26,7 @@ pub struct Expense {
 #[serde(default)]
 #[table_name = "expense"]
 pub struct NewExpense {
-    pub user_pay_method_id: i8,
+    pub user_pay_method_id: i16,
     pub ammount: f64,
     pub description: String
 }
@@ -56,7 +56,7 @@ impl Expense {
         let current_user_pay_method_id = user_pay_method
             .filter(user_id.eq(logged_user_id))
             .select(id)
-            .first::<i8>(connection)
+            .first::<i16>(connection)
             .map_err(|_| { ElogError::ObjectNotFound(logged_user_id.to_string()) });
 
         match current_user_pay_method_id {

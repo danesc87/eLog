@@ -6,8 +6,13 @@ This repo contains the REST backend for **eLog** expenses manager. It's built up
 - Rust
 - MariaDB
 - Development Requirements
-  - libmariadb-devel (openSUSE)
-  - libmariadb-dev-compat (Ubuntu)
+  - MariaDB/Mysql
+    - libmariadb-devel (openSUSE)
+    - libmariadb-dev-compat (Debian/Ubuntu)
+  - SQLite
+    - sqlite3-devel (openSUSE)
+    - libsqlite3-dev (Debian/Ubuntu)
+
 - Env File
 
 ### Init MariaDB

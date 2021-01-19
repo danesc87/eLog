@@ -15,9 +15,9 @@ use super::schema::user_pay_method::dsl::*;
 
 #[derive(Queryable, Serialize, Deserialize)]
 pub struct UserPayMethod {
-    pub id: i8,
+    pub id: i16,
     pub user_id: i16,
-    pub pay_type_id: i8,
+    pub pay_type_id: i16,
     pub bank_name: String,
     pub description: String,
     pub enabled: bool,
@@ -29,7 +29,7 @@ pub struct UserPayMethod {
 #[table_name = "user_pay_method"]
 pub struct NewUserPayMethod {
     pub user_id: i16,
-    pub pay_type_id: i8,
+    pub pay_type_id: i16,
     pub bank_name: String,
     pub description: String,
     pub enabled: bool

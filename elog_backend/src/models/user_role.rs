@@ -10,12 +10,12 @@ use super::schema::user_role::dsl::*;
 
 #[derive(Queryable, Serialize, Deserialize)]
 pub struct UserRole {
-    pub id: i8,
+    pub id: i16,
     pub description: String
 }
 
 impl UserRole {
-    pub fn get_with_id(connection: &SqlConnection, role_id: i8) -> Self {
+    pub fn get_with_id(connection: &SqlConnection, role_id: i16) -> Self {
         user_role
             .filter(id.eq(role_id))
             .first::<UserRole>(connection)
