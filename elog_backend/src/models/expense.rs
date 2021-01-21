@@ -18,7 +18,7 @@ pub struct Expense {
     pub id: i32,
     pub user_category_id: i16,
     pub user_pay_method_id: i16,
-    pub ammount: f64,
+    pub amount: f64,
     pub description: String,
     pub register_date: NaiveDateTime
 }
@@ -29,7 +29,7 @@ pub struct Expense {
 pub struct NewExpense {
     pub user_category_id: i16,
     pub user_pay_method_id: i16,
-    pub ammount: f64,
+    pub amount: f64,
     pub description: String
 }
 
@@ -39,7 +39,7 @@ impl Default for NewExpense {
         NewExpense {
             user_category_id: 0,
             user_pay_method_id: 0,
-            ammount: 0.0,
+            amount: 0.0,
             description: String::from("")
         }
     }
@@ -50,7 +50,7 @@ pub struct ExpenseWithCategoriesAndPayethods {
     pub id: i32,
     pub user_category: String,
     pub user_pay_method: String,
-    pub ammount: f64,
+    pub amount: f64,
     pub description: String,
     pub register_date: NaiveDateTime
 }
@@ -75,7 +75,7 @@ impl Expense {
                 expense::id,
                 user_category::category,
                 user_pay_method::bank_name,
-                expense::ammount,
+                expense::amount,
                 expense::description,
                 expense::register_at
             ))

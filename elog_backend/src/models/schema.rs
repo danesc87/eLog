@@ -55,7 +55,7 @@ table! {
         id -> Integer,
         user_category_id -> SmallInt,
         user_pay_method_id -> SmallInt,
-        ammount -> Double,
+        amount -> Double,
         description -> Varchar,
         register_at -> Timestamp,
     }

@@ -52,7 +52,7 @@ CREATE TABLE IF NOT EXISTS expense (
   id INT NOT NULL AUTO_INCREMENT,
   user_category_id SMALLINT NOT NULL,
   user_pay_method_id SMALLINT NOT NULL,
-  ammount DOUBLE(19,6),
+  amount DOUBLE(19,6),
   description VARCHAR(255),
   register_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
