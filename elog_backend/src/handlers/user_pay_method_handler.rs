@@ -13,7 +13,7 @@ use crate::utils::error_mapper::ElogError;
 use crate::authentication::AuthenticatedRequest;
 
 #[post("/user_pay_method/{pay_type_id}")]
-pub async fn insert_user_pay_method (
+pub async fn insert_user_pay_method(
     authenticated_request: AuthenticatedRequest,
     dynamic_path: web::Path<(i16,)>,
     mut new_user_pay_method: web::Json<NewUserPayMethod>

@@ -39,9 +39,19 @@ CREATE TABLE IF NOT EXISTS user_pay_method (
   FOREIGN KEY (pay_type_id) REFERENCES pay_type (id)
 );
 
+CREATE TABLE IF NOT EXISTS user_category (
+  id SMALLINT NOT NULL AUTO_INCREMENT,
+  user_id SMALLINT NOT NULL,
+  category VARCHAR(100) NOT NULL,
+  description VARCHAR(255),
+  PRIMARY KEY(id),
+  FOREIGN KEY (user_id) REFERENCES app_user (id)
+);
+
 CREATE TABLE IF NOT EXISTS expense (
   id INT NOT NULL AUTO_INCREMENT,
   user_pay_method_id SMALLINT NOT NULL,
+  user_category_id SMALLINT NOT NULL,
   ammount DOUBLE(19,6),
   description VARCHAR(255),
   register_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,

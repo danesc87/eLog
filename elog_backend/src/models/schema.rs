@@ -38,6 +38,15 @@ table! {
 }
 
 table! {
+    user_category (id) {
+        id -> SmallInt,
+        user_id -> SmallInt,
+        category -> Varchar,
+        description -> Varchar,
+    }
+}
+
+table! {
     expense (id) {
         id -> Integer,
         user_pay_method_id -> SmallInt,
