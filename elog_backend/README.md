@@ -55,13 +55,24 @@ JWT_SECRET=elog-super-secret-key
 TOKEN_DURATION_MIN=60
 ```
 
+### Release
+
+Release version should be changed because it'll be a hardcoded String in `session_properties.rs` file
+
 ### Run
 
-Run eLog backend
+Run eLog Backend
 
 ```bash
-cd elog_backend
 cargo run
+```
+
+### Build
+
+Build eLog Backend with **debug** compatibility
+
+```bash
+cargo build
 ```
 
 ### Endpoints
