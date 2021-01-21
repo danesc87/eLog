@@ -1,6 +1,6 @@
 # eLog Backend
 
-This repo contains the REST backend for **eLog** expenses manager. It's built upon Rust, Actix, Diesel and MariaDB
+This repo contains the REST backend for **eLog** expenses manager. It's built upon Rust, Actix, Diesel and MariaDB, but it can work with SQLite3 and PostgreSQL as well.
 
 ### Requirements
 - Rust

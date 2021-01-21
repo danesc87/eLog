@@ -1,3 +1,7 @@
+// ###### //
+// Tables //
+// ##### //
+
 table! {
     user_role (id) {
         id -> SmallInt,
@@ -49,6 +53,7 @@ table! {
 table! {
     expense (id) {
         id -> Integer,
+        user_category_id -> SmallInt,
         user_pay_method_id -> SmallInt,
         ammount -> Double,
         description -> Varchar,
@@ -62,3 +67,11 @@ table! {
         expiration_date -> Timestamp,
     }
 }
+
+// ############# //
+// Allowed Joins //
+// ############# //
+
+joinable!(expense -> user_category (user_category_id));
+joinable!(expense -> user_pay_method (user_pay_method_id));
+allow_tables_to_appear_in_same_query!(expense, user_category, user_pay_method);

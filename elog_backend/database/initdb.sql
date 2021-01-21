@@ -50,12 +50,13 @@ CREATE TABLE IF NOT EXISTS user_category (
 
 CREATE TABLE IF NOT EXISTS expense (
   id INT NOT NULL AUTO_INCREMENT,
-  user_pay_method_id SMALLINT NOT NULL,
   user_category_id SMALLINT NOT NULL,
+  user_pay_method_id SMALLINT NOT NULL,
   ammount DOUBLE(19,6),
   description VARCHAR(255),
   register_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
+  FOREIGN KEY (user_category_id) REFERENCES user_category (id),
   FOREIGN KEY (user_pay_method_id) REFERENCES user_pay_method (id)
 );
 
