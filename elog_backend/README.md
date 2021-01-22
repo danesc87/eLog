@@ -1,6 +1,6 @@
 # eLog Backend
 
-This repo contains the REST backend for **eLog** expenses manager. It's built upon Rust, Actix, Diesel and MariaDB
+This repo contains the REST backend for **eLog** expenses manager. It's built upon Rust, Actix, Diesel and MariaDB, but it can work with SQLite3 and PostgreSQL as well.
 
 ### Requirements
 - Rust
@@ -55,13 +55,24 @@ JWT_SECRET=elog-super-secret-key
 TOKEN_DURATION_MIN=60
 ```
 
+### Release
+
+Release version should be changed because it'll be a hardcoded String in `session_properties.rs` file
+
 ### Run
 
-Run eLog backend
+Run eLog Backend
 
 ```bash
-cd elog_backend
 cargo run
+```
+
+### Build
+
+Build eLog Backend with **debug** compatibility
+
+```bash
+cargo build
 ```
 
 ### Endpoints
@@ -232,12 +243,12 @@ Response
 ]
 ```
 
-#### insert_expense
+#### insert_user_category
 
 Request
 
 ```
-path: /expense/{user_pay_method_id}
+path: /user_category
 method: POST
 headers: Bearer token
 ```
@@ -246,7 +257,49 @@ Body
 
 ```json
 {
-	"ammount": 40.6,
+  "category": "Category Name",
+  "description": "Category Description"
+}
+```
+
+#### get_user_categories
+
+Request
+
+```
+path: /user_category
+method: GET
+headers: Bearer token
+```
+
+Response
+
+```json
+[
+  {
+    "id": 1,
+    "user_id": 1,
+    "category": "Category Name",
+    "description": "Category Description"
+  }
+]
+```
+
+#### insert_expense
+
+Request
+
+```
+path: /expense/{user_category_id}/{user_pay_method_id}
+method: POST
+headers: Bearer token
+```
+
+Body
+
+```json
+{
+	"amount": 40.6,
 	"description": "Whisky"
 }
 ```
@@ -267,15 +320,17 @@ Response
 [
   {
     "id": 18,
-    "user_pay_method_id": 5,
-    "ammount": 40.6,
+    "user_category": "Alcohol",
+    "user_pay_method": "Bank",
+    "amount": 40.6,
     "description": "Whisky",
     "register_date": "2020-12-01T23:45:03"
   },
   {
     "id": 19,
-    "user_pay_method_id": 5,
-    "ammount": 63.07,
+    "user_category": "Supermarket",
+    "user_pay_method": "Credit Card",
+    "amount": 63.07,
     "description": "Supermarket",
     "register_date": "2020-12-01T23:45:47"
   }
