@@ -9,6 +9,16 @@
  - vuex
  - vue-router
 
+## Configure server addresses
+
+Edit variables into `src/helpers/config.js`:
+
+```
+var apiUrl = 'localhost';
+var apiPort = '8090';
+var protocol = 'http'
+```
+
 ## Project setup
 ```
 npm install
