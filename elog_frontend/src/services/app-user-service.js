@@ -1,7 +1,9 @@
-import {unauthHeader, serverUrl} from '../helpers';
+import {authHeader, unauthHeader, serverUrl} from '../helpers';
 
 export const appUserServices = {
-    register
+    register,
+    login,
+    logout
 }
 
 async function register (appUserDTO){
@@ -18,22 +20,56 @@ async function register (appUserDTO){
 
 }
 
+async function login(username, password) {
+    const requestOptions = {
+        method: 'POST',
+        headers: unauthHeader(),
+        body: JSON.stringify({ username, password })
+    };
+    return fetch(`${serverUrl()}/login`, requestOptions)
+    .then(handleResponse)
+    .then(response => {
+        let response_server = JSON.parse(response);
+        let user = null;
+        if (response_server['access_token']) {
+            user = [];
+            user = {'username': username, 'token_type': response_server['token_type'], 'access_token': response_server['access_token']};
+            localStorage.setItem('user', JSON.stringify(user));
+            return user;
+        } else {
+            return response;
+        }
+    });
+}
+
+async function logout() {
+    const requestOptions = {
+        method: 'GET',
+        headers: authHeader()
+    };
+    return fetch(`${serverUrl()}/logout`, requestOptions)
+    .then(async response => {
+        localStorage.removeItem('user');
+        return response.text().then(text => {
+            if (!response.ok) {
+                const error = text || response.statusText;
+                return Promise.reject(error);
+            }
+            return text;
+        });
+    });
+}
+
 async function handleResponse(response) {
     return response.text().then(text => {
-        let data = null;
-        try{
-            data = text; //&& JSON.parse(text);
-        }catch{
-            data = text;
-        }
         if (!response.ok) {
             if (response.status === 401) {
                 // auto logout if 401 response returned from api
-                //logout();
+                logout();
             }
-            const error = data || response.statusText;
+            const error = text || response.statusText;
             return Promise.reject(error);
         }
-        return data;
+        return text;
     });
 }

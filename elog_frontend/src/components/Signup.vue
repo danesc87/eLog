@@ -54,12 +54,15 @@
         </b-button>
       </div>
         <p class="text-center text-danger pt-2" v-if="error">{{errorMsg}}</p>
-        <b-modal ref="register-modal" hide-footer v-model="processState">
+        <b-modal ref="register-modal" no-close-on-backdrop no-close-on-esc hide-footer v-model="processState" @close="onReset">
           <template class="text-center" #modal-title>
             {{successMsg}}
           </template>
-          <b-button class="btn-success mt-3" block @click="onReset" to="/">OK</b-button>
+          <b-button class="btn-success mt-3" block @click="onReset">OK</b-button>
         </b-modal>
+        <div class="pt-5">
+          <b-button :to="{name: 'home'}" variant="outline-success">Back to home</b-button>
+      </div>
   </div>
 </template>
 
@@ -88,6 +91,7 @@
         this.form.AppUser.email = '';
         this.form.AppUser.password = '';
         this.cleanAll();
+        this.$router.push({name: 'home'});
       }
     }
   }
