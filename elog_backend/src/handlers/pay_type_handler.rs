@@ -23,7 +23,9 @@ pub async fn insert_pay_type (
 }
 
 #[get("/pay_type")]
-pub async fn get_all_pay_types(authenticated_request: AuthenticatedRequest) -> Result<HttpResponse, ElogError> {
+pub async fn get_all_pay_types(
+    authenticated_request: AuthenticatedRequest
+) -> Result<HttpResponse, ElogError> {
     PayType::get_list(&authenticated_request.connection).map(|list| {
         HttpResponse::Ok().json(list)
     })

@@ -50,7 +50,10 @@ pub struct AppUserToken {
 
 impl AppUser {
 
-    pub fn register(connection: &SqlConnection, mut new_user: NewAppUser) -> Result<usize, ElogError> {
+    pub fn register(
+        connection: &SqlConnection,
+        mut new_user: NewAppUser
+    ) -> Result<usize, ElogError> {
         use data_encoding::BASE64;
         new_user.password = BASE64.encode(new_user.password.as_bytes());
         insert_into(app_user)
@@ -59,7 +62,10 @@ impl AppUser {
             .map_err(|error| { ElogError::InsertFailure(error.to_string()) })
     }
 
-    pub fn login(connection: &SqlConnection, login_app_user: LoginAppUser) -> Result<AppUserToken, ElogError> {
+    pub fn login(
+        connection: &SqlConnection,
+        login_app_user: LoginAppUser
+    ) -> Result<AppUserToken, ElogError> {
         use data_encoding::BASE64;
         let logged_app_user = app_user
             .filter(username.eq(login_app_user.username.clone()))

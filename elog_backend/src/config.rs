@@ -30,7 +30,8 @@ pub fn route_config(config: &mut web::ServiceConfig) {
         expense_handler::{
             insert_expense,
             get_all_expenses
-        }
+        },
+        report_handler::get_expenses_for_report,
     };
 
     config
@@ -45,5 +46,6 @@ pub fn route_config(config: &mut web::ServiceConfig) {
         .service(insert_user_pay_method)
         .service(get_all_user_pay_methods)
         .service(insert_expense)
-        .service(get_all_expenses);
+        .service(get_all_expenses)
+        .service(get_expenses_for_report);
 }

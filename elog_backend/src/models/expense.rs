@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use crate::utils::database_utils::SqlConnection;
 use diesel::{
     insert_into,
@@ -46,7 +47,7 @@ impl Default for NewExpense {
 }
 
 #[derive(Queryable, Serialize)]
-pub struct ExpenseWithCategoriesAndPayethods {
+pub struct ExpenseWithCategoriesAndPayMethods {
     pub id: i32,
     pub user_category: String,
     pub user_pay_method: String,
@@ -55,16 +56,28 @@ pub struct ExpenseWithCategoriesAndPayethods {
     pub register_date: NaiveDateTime
 }
 
+#[derive(Queryable, Serialize)]
+pub struct ExpenseForReport {
+    pub amount: f64,
+    pub category: String
+}
+
 impl Expense {
 
-    pub fn insert(connection: &SqlConnection, new_expense: NewExpense) -> Result<usize, ElogError> {
+    pub fn insert(
+        connection: &SqlConnection,
+        new_expense: NewExpense
+    ) -> Result<usize, ElogError> {
         insert_into(expense)
             .values(&new_expense)
             .execute(connection)
             .map_err(|error| { ElogError::InsertFailure(error.to_string()) })
     }
 
-    pub fn get_list(connection: &SqlConnection, logged_user_id: i16) -> Result<Vec<ExpenseWithCategoriesAndPayethods>, ElogError> {
+    pub fn get_list(
+        connection: &SqlConnection,
+        logged_user_id: i16
+    ) -> Result<Vec<ExpenseWithCategoriesAndPayMethods>, ElogError> {
         use super::schema::{user_category, user_pay_method};
         expense
             .inner_join(user_category::table)
@@ -79,7 +92,44 @@ impl Expense {
                 expense::description,
                 expense::register_at
             ))
-            .load::<ExpenseWithCategoriesAndPayethods>(connection)
+            .load::<ExpenseWithCategoriesAndPayMethods>(connection)
             .map_err(|_| { ElogError::ObjectNotFound(logged_user_id.to_string()) })
+    }
+
+    pub fn get_expenses_for_report(
+        connection: &SqlConnection,
+        logged_user_id: i16
+    ) -> Result<Vec<ExpenseForReport>, ElogError> {
+        let all_expenses = Self::get_list(connection, logged_user_id);
+        if all_expenses.is_ok() {
+            let expense_map = Self::insert_or_update_category_amount(all_expenses.unwrap());
+            Ok(Self::get_all_report_expenses(expense_map))
+        } else {
+            Err(all_expenses.err().unwrap())
+        }
+    }
+
+    fn insert_or_update_category_amount(
+        all_expenses: Vec<ExpenseWithCategoriesAndPayMethods>
+    ) -> HashMap<String, f64> {
+        let mut expense_map: HashMap<String, f64> = HashMap::new();
+        for each_expense in &all_expenses {
+            let category: String = each_expense.user_category.clone();
+            match expense_map.get(&category) {
+                Some(_) => expense_map.insert(category.clone(), each_expense.amount + expense_map[&category]),
+                None => expense_map.insert(category, each_expense.amount)
+            };
+        }
+        expense_map
+    }
+
+    fn get_all_report_expenses(expense_map: HashMap<String, f64>) -> Vec<ExpenseForReport> {
+        let mut expense_for_report: Vec<ExpenseForReport> = Vec::new();
+        for (category, a) in expense_map {
+            expense_for_report.push(
+                ExpenseForReport { amount: a, category }
+            );
+        }
+        expense_for_report
     }
 }

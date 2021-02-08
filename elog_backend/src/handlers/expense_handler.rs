@@ -29,7 +29,9 @@ pub async fn insert_expense (
 }
 
 #[get("/expense")]
-pub async fn get_all_expenses(authenticated_request: AuthenticatedRequest) -> Result<HttpResponse, ElogError> {
+pub async fn get_all_expenses(
+    authenticated_request: AuthenticatedRequest
+) -> Result<HttpResponse, ElogError> {
     Expense::get_list(
         &authenticated_request.connection,
         authenticated_request.user_id

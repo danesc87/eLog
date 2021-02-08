@@ -28,7 +28,9 @@ pub async fn insert_user_category(
 
 
 #[get("/user_category")]
-pub async fn get_all_user_categories(authenticated_request: AuthenticatedRequest) -> Result<HttpResponse, ElogError> {
+pub async fn get_all_user_categories(
+    authenticated_request: AuthenticatedRequest
+) -> Result<HttpResponse, ElogError> {
     UserCategory::get_list(
         &authenticated_request.connection,
         authenticated_request.user_id
