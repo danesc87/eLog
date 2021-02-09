@@ -9,7 +9,6 @@ use diesel::{
 };
 
 use chrono::NaiveDateTime;
-use chrono::Duration;
 use crate::utils::error_mapper::ElogError;
 
 use super::schema::expense;
@@ -99,7 +98,9 @@ impl Expense {
 
     pub fn get_expenses_for_report(
         connection: &SqlConnection,
-        logged_user_id: i16
+        logged_user_id: i16,
+        since_when_date: NaiveDateTime,
+        until_when_date: NaiveDateTime,
     ) -> Result<Vec<ExpenseForReport>, ElogError> {
         use super::schema::{user_category, user_pay_method};
         let all_expenses= expense
@@ -107,6 +108,8 @@ impl Expense {
             .inner_join(user_pay_method::table)
             .filter(user_category::user_id.eq(user_pay_method::user_id))
             .filter(user_category::user_id.eq(logged_user_id))
+            .filter(register_at.ge(since_when_date))
+            .filter(register_at.le(until_when_date))
             .select((
                 expense::id,
                 user_category::category,

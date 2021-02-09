@@ -347,6 +347,13 @@ method: GET
 headers: Bearer token
 ```
 
+Query Parameters
+
+```
+since_when -> Milliseconds
+until_when -> Milliseconds
+```
+
 Response
 
 ```json
