@@ -7,7 +7,7 @@ use chrono::{
 
 use crate::utils::error_mapper::ElogError;
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize)]
 #[serde(default)]
 pub struct DateQueryParameters {
     since_when: Option<i64>,
