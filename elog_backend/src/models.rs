@@ -1,5 +1,6 @@
 pub mod app_user;
 pub mod expense;
+pub mod expense_report;
 pub mod pay_type;
 pub mod schema;
 pub mod session_properties;

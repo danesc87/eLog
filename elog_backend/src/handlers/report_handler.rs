@@ -10,12 +10,12 @@ use chrono::{
     NaiveDateTime
 };
 
-use crate::models::expense::Expense;
+use crate::models::expense_report::ExpenseForReport;
 use crate::utils::error_mapper::ElogError;
 use crate::authentication::AuthenticatedRequest;
 
 #[derive(Deserialize, Debug)]
-pub struct ReportQueryParameters {
+pub struct DateQueryParameters {
     since_when: Option<i64>,
     until_when: Option<i64>
 }
@@ -24,28 +24,26 @@ pub struct ReportQueryParameters {
 #[get("/report/expense")]
 pub async fn get_expenses_for_report(
     authenticated_request: AuthenticatedRequest,
-    report_query_parameters: web::Query<ReportQueryParameters>
+    date_query_parameters: web::Query<DateQueryParameters>
 ) -> Result<HttpResponse, ElogError> {
-    let naive_dates = get_report_dates(report_query_parameters.0);
-    Expense::get_expenses_for_report(
+    ExpenseForReport::get_expenses_for_report(
         &authenticated_request.connection,
         authenticated_request.user_id,
-        naive_dates.0,
-        naive_dates.1
+        get_report_dates(date_query_parameters.0)
     ).map(|list| {
         HttpResponse::Ok().json(list)
     })
 }
 
 fn get_report_dates(
-    report_query_parameters: ReportQueryParameters
+    date_query_parameters: DateQueryParameters
 ) -> (NaiveDateTime, NaiveDateTime) {
     use std::i64;
-    let since_millis = Duration::milliseconds(report_query_parameters
+    let since_millis = Duration::milliseconds(date_query_parameters
         .since_when
         .unwrap_or(0))
         .to_std().unwrap();
-    let until_millis = Duration::milliseconds(report_query_parameters
+    let until_millis = Duration::milliseconds(date_query_parameters
         .until_when
         .unwrap_or(Local::now().timestamp_millis()))
         .to_std().unwrap();

@@ -357,14 +357,18 @@ until_when -> Milliseconds
 Response
 
 ```json
-[
-  {
-    "amount": 30.08,
-    "category": "Supermarket"
-  },
-  {
-    "amount": 24.0,
-    "category": "Vet"
-  }
-]
+{
+  "expenses_by_group": [
+    {
+      "amount": 30.08,
+      "category": "Supermarket"
+    },
+    {
+      "amount": 24.0,
+      "category": "Vet"
+    }
+  ],
+  "since_when": "1970-01-01T00:00:00",
+  "until_when": "2021-02-06T04:03:03"
+}
 ```
