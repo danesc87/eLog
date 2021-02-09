@@ -16,7 +16,10 @@ use crate::models::app_user::{
 };
 use crate::models::session_properties::SessionProperties;
 
-use crate::utils::error_mapper::ElogError;
+use crate::utils::{
+    error_mapper::ElogError,
+    http_request_utils::get_token_from_auth_header
+};
 use crate::authentication::AuthenticatedRequest;
 
 #[post("/register")]
@@ -42,7 +45,9 @@ pub async fn login(
 }
 
 #[get("/logout")]
-pub async fn logout(authenticated_request: AuthenticatedRequest) -> Result<HttpResponse, ElogError> {
+pub async fn logout(
+    authenticated_request: AuthenticatedRequest
+) -> Result<HttpResponse, ElogError> {
     AppUser::logout(
         &authenticated_request.connection,
         authenticated_request.string_token.as_str()
@@ -59,11 +64,12 @@ pub async fn session_properties(
     let auth = http_request.headers().get("Authorization");
     match auth {
         Some(_) => {
-            let splitted_header_token: Vec<&str> = auth.unwrap().to_str().unwrap().split("Bearer").collect();
-            let token = splitted_header_token[1].trim();
             let connection = pool_handler(Some(&pool));
             HttpResponse::Ok().json(
-                SessionProperties::get_session_properties(&connection.unwrap(), token)
+                SessionProperties::get_session_properties(
+                    &connection.unwrap(),
+                    get_token_from_auth_header(auth)
+                )
             )
         },
         None => HttpResponse::Ok().json(SessionProperties::no_token_session_properties())

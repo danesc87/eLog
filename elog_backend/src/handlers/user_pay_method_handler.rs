@@ -29,7 +29,9 @@ pub async fn insert_user_pay_method(
 }
 
 #[get("/user_pay_method")]
-pub async fn get_all_user_pay_methods(authenticated_request: AuthenticatedRequest) -> Result<HttpResponse, ElogError> {
+pub async fn get_all_user_pay_methods(
+    authenticated_request: AuthenticatedRequest
+) -> Result<HttpResponse, ElogError> {
     UserPayMethod::get_list(
         &authenticated_request.connection,
         authenticated_request.user_id

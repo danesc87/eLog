@@ -50,14 +50,20 @@ impl Default for NewUserPayMethod {
 
 impl UserPayMethod {
 
-    pub fn insert(connection: &SqlConnection, new_user_pay_method: NewUserPayMethod) -> Result<usize, ElogError> {
+    pub fn insert(
+        connection: &SqlConnection,
+        new_user_pay_method: NewUserPayMethod
+    ) -> Result<usize, ElogError> {
         insert_into(user_pay_method)
             .values(&new_user_pay_method)
             .execute(connection)
             .map_err(|error| { ElogError::InsertFailure(error.to_string()) })
     }
 
-    pub fn get_list(connection: &SqlConnection, logged_user_id: i16) -> Result<Vec<UserPayMethod>, ElogError> {
+    pub fn get_list(
+        connection: &SqlConnection,
+        logged_user_id: i16
+    ) -> Result<Vec<UserPayMethod>, ElogError> {
         user_pay_method
             .filter(user_id.eq(logged_user_id))
             .load::<UserPayMethod>(connection)

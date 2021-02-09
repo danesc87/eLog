@@ -28,7 +28,9 @@ fn init_database(database_url: &str) -> Result<SqlPool, PoolError> {
     Pool::builder().max_size(pool_size).build(manager)
 }
 
-pub fn pool_handler(connection_pool: Option<&web::Data<SqlPool>>) -> Result<SqlPooledConnection, HttpResponse> {
+pub fn pool_handler(
+    connection_pool: Option<&web::Data<SqlPool>>
+) -> Result<SqlPooledConnection, HttpResponse> {
     connection_pool
         .ok_or(HttpResponse::InternalServerError().json("No Data Base connection exists!".to_owned()))
         .and_then(|pool| {

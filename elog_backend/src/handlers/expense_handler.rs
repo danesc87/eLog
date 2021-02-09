@@ -4,6 +4,8 @@ use actix_web::{
     get,
     post
 };
+
+use chrono::{Local, Datelike, NaiveDate, NaiveTime, NaiveDateTime};
 use crate::models::expense::{
     Expense,
     NewExpense
@@ -29,10 +31,18 @@ pub async fn insert_expense (
 }
 
 #[get("/expense")]
-pub async fn get_all_expenses(authenticated_request: AuthenticatedRequest) -> Result<HttpResponse, ElogError> {
-    Expense::get_list(
+pub async fn get_all_expenses(
+    authenticated_request: AuthenticatedRequest
+) -> Result<HttpResponse, ElogError> {
+    let current_date = Local::now().naive_local();
+    let beggining_date = NaiveDateTime::new(
+        NaiveDate::from_ymd(current_date.year(), current_date.month(), 1),
+        NaiveTime::from_hms_milli(0,0,0,0)
+    );
+    Expense::get_all_expenses(
         &authenticated_request.connection,
-        authenticated_request.user_id
+        authenticated_request.user_id,
+        Some((beggining_date, current_date))
     ).map(|list| {
         HttpResponse::Ok().json(list)
     })

@@ -25,7 +25,10 @@ pub struct NewPayType {
 
 impl PayType {
 
-    pub fn insert(connection: &SqlConnection, new_pay_type: NewPayType) -> Result<usize, ElogError>{
+    pub fn insert(
+        connection: &SqlConnection,
+        new_pay_type: NewPayType
+    ) -> Result<usize, ElogError> {
         insert_into(pay_type)
             .values(&new_pay_type)
             .execute(connection)

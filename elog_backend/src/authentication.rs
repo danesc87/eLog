@@ -13,6 +13,7 @@ use crate::utils::database_utils::{
     pool_handler
 };
 use crate::models::token::Claims;
+use crate::utils::http_request_utils::get_token_from_auth_header;
 
 pub struct AuthenticatedRequest{
     pub user_id: i16,
@@ -29,8 +30,7 @@ impl FromRequest for AuthenticatedRequest {
         let auth = http_request.headers().get("Authorization");
         match auth {
             Some(_) => {
-                let splitted_header_token: Vec<&str> = auth.unwrap().to_str().unwrap().split("Bearer").collect();
-                let token = splitted_header_token[1].trim();
+                let token = get_token_from_auth_header(auth);
                 let pool_from_app_data = http_request.app_data::<web::Data<SqlPool>>();
                 let connection = pool_handler(pool_from_app_data);
                 if Claims::is_valid_token(&connection.as_ref().clone().unwrap(), token) {

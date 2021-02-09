@@ -8,8 +8,8 @@ use diesel::{
 };
 
 use chrono::NaiveDateTime;
-use crate::utils::error_mapper::ElogError;
 
+use crate::utils::error_mapper::ElogError;
 use super::schema::expense;
 use super::schema::expense::dsl::*;
 
@@ -46,7 +46,7 @@ impl Default for NewExpense {
 }
 
 #[derive(Queryable, Serialize)]
-pub struct ExpenseWithCategoriesAndPayethods {
+pub struct ExpenseWithCategoriesAndPayMethods {
     pub id: i32,
     pub user_category: String,
     pub user_pay_method: String,
@@ -57,20 +57,34 @@ pub struct ExpenseWithCategoriesAndPayethods {
 
 impl Expense {
 
-    pub fn insert(connection: &SqlConnection, new_expense: NewExpense) -> Result<usize, ElogError> {
+    pub fn insert(
+        connection: &SqlConnection,
+        new_expense: NewExpense
+    ) -> Result<usize, ElogError> {
         insert_into(expense)
             .values(&new_expense)
             .execute(connection)
             .map_err(|error| { ElogError::InsertFailure(error.to_string()) })
     }
 
-    pub fn get_list(connection: &SqlConnection, logged_user_id: i16) -> Result<Vec<ExpenseWithCategoriesAndPayethods>, ElogError> {
+    pub fn get_all_expenses(
+        connection: &SqlConnection,
+        logged_user_id: i16,
+        naive_date_times_opt: Option<(NaiveDateTime, NaiveDateTime)>
+    ) -> Result<Vec<ExpenseWithCategoriesAndPayMethods>, ElogError> {
         use super::schema::{user_category, user_pay_method};
+        
+        let naive_date_times = naive_date_times_opt.unwrap_or((
+            NaiveDateTime::from_timestamp(0,0),
+            chrono::Local::now().naive_local()
+        ));
         expense
             .inner_join(user_category::table)
             .inner_join(user_pay_method::table)
             .filter(user_category::user_id.eq(user_pay_method::user_id))
             .filter(user_category::user_id.eq(logged_user_id))
+            .filter(register_at.ge(naive_date_times.0))
+            .filter(register_at.le(naive_date_times.1))
             .select((
                 expense::id,
                 user_category::category,
@@ -79,7 +93,7 @@ impl Expense {
                 expense::description,
                 expense::register_at
             ))
-            .load::<ExpenseWithCategoriesAndPayethods>(connection)
+            .load::<ExpenseWithCategoriesAndPayMethods>(connection)
             .map_err(|_| { ElogError::ObjectNotFound(logged_user_id.to_string()) })
     }
 }

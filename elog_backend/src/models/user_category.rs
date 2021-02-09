@@ -41,14 +41,20 @@ impl Default for NewUserCategory {
 
 impl UserCategory {
 
-    pub fn insert(connection: &SqlConnection, new_user_category: NewUserCategory) -> Result<usize, ElogError> {
+    pub fn insert(
+        connection: &SqlConnection,
+        new_user_category: NewUserCategory
+    ) -> Result<usize, ElogError> {
         insert_into(user_category)
             .values(&new_user_category)
             .execute(connection)
             .map_err(|error| { ElogError::InsertFailure(error.to_string()) })
     }
 
-    pub fn get_list(connection: &SqlConnection, logged_user_id: i16) -> Result<Vec<UserCategory>, ElogError> {
+    pub fn get_list(
+        connection: &SqlConnection,
+        logged_user_id: i16
+    ) -> Result<Vec<UserCategory>, ElogError> {
         user_category
             .filter(user_id.eq(logged_user_id))
             .load::<UserCategory>(connection)
