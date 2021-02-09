@@ -2,8 +2,8 @@ use actix_web::{
     HttpResponse,
     get,
 };
-use crate::models::expense::Expense;
 
+use crate::models::expense::Expense;
 use crate::utils::error_mapper::ElogError;
 use crate::authentication::AuthenticatedRequest;
 

@@ -336,3 +336,28 @@ Response
   }
 ]
 ```
+
+#### get_expenses_for_report
+
+Request
+
+```
+path: /report/expense
+method: GET
+headers: Bearer token
+```
+
+Response
+
+```json
+[
+  {
+    "amount": 30.08,
+    "category": "Supermarket"
+  },
+  {
+    "amount": 24.0,
+    "category": "Vet"
+  }
+]
+```

@@ -13,7 +13,7 @@ use crate::utils::database_utils::{
     pool_handler
 };
 use crate::models::token::Claims;
-use crate::utils::token_utils::get_token_from_auth_header;
+use crate::utils::http_request_utils::get_token_from_auth_header;
 
 pub struct AuthenticatedRequest{
     pub user_id: i16,

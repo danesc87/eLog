@@ -9,6 +9,7 @@ use diesel::{
 };
 
 use chrono::NaiveDateTime;
+use chrono::Duration;
 use crate::utils::error_mapper::ElogError;
 
 use super::schema::expense;
@@ -100,16 +101,31 @@ impl Expense {
         connection: &SqlConnection,
         logged_user_id: i16
     ) -> Result<Vec<ExpenseForReport>, ElogError> {
-        let all_expenses = Self::get_list(connection, logged_user_id);
+        use super::schema::{user_category, user_pay_method};
+        let all_expenses= expense
+            .inner_join(user_category::table)
+            .inner_join(user_pay_method::table)
+            .filter(user_category::user_id.eq(user_pay_method::user_id))
+            .filter(user_category::user_id.eq(logged_user_id))
+            .select((
+                expense::id,
+                user_category::category,
+                user_pay_method::bank_name,
+                expense::amount,
+                expense::description,
+                expense::register_at
+            ))
+            .load::<ExpenseWithCategoriesAndPayMethods>(connection)
+            .map_err(|_| { ElogError::ObjectNotFound(logged_user_id.to_string()) });
         if all_expenses.is_ok() {
-            let expense_map = Self::insert_or_update_category_amount(all_expenses.unwrap());
+            let expense_map = Self::insert_or_update_category_amount_on_map(all_expenses.unwrap());
             Ok(Self::get_all_report_expenses(expense_map))
         } else {
             Err(all_expenses.err().unwrap())
         }
     }
 
-    fn insert_or_update_category_amount(
+    fn insert_or_update_category_amount_on_map(
         all_expenses: Vec<ExpenseWithCategoriesAndPayMethods>
     ) -> HashMap<String, f64> {
         let mut expense_map: HashMap<String, f64> = HashMap::new();

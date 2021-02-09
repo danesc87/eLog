@@ -18,7 +18,7 @@ use crate::models::session_properties::SessionProperties;
 
 use crate::utils::{
     error_mapper::ElogError,
-    token_utils::get_token_from_auth_header
+    http_request_utils::get_token_from_auth_header
 };
 use crate::authentication::AuthenticatedRequest;
 
