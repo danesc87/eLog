@@ -29,13 +29,13 @@ pub async fn get_expenses_for_report(
     ExpenseForReport::get_expenses_for_report(
         &authenticated_request.connection,
         authenticated_request.user_id,
-        get_report_dates(date_query_parameters.0)
+        get_report_naive_date_times(date_query_parameters.0)
     ).map(|list| {
         HttpResponse::Ok().json(list)
     })
 }
 
-fn get_report_dates(
+fn get_report_naive_date_times(
     date_query_parameters: DateQueryParameters
 ) -> (NaiveDateTime, NaiveDateTime) {
     use std::i64;
