@@ -32,9 +32,10 @@ pub async fn insert_expense (
 pub async fn get_all_expenses(
     authenticated_request: AuthenticatedRequest
 ) -> Result<HttpResponse, ElogError> {
-    Expense::get_list(
+    Expense::get_all_expenses(
         &authenticated_request.connection,
-        authenticated_request.user_id
+        authenticated_request.user_id,
+        None
     ).map(|list| {
         HttpResponse::Ok().json(list)
     })

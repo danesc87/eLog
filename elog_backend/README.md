@@ -358,7 +358,7 @@ Response
 
 ```json
 {
-  "expenses_by_group": [
+  "expenses": [
     {
       "amount": 30.08,
       "category": "Supermarket"

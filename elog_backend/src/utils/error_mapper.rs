@@ -11,6 +11,8 @@ pub enum ElogError {
     ErrorRetrievingData(String),
     #[fail(display="{} TokenCreationError", _0)]
     TokenCreationError(String),
+    #[fail(display="{} BadQueryParameters", _0)]
+    BadQueryParameters(String),
 }
 
 impl ResponseError for ElogError {
@@ -24,6 +26,8 @@ impl ResponseError for ElogError {
                 .json(message),
             ElogError::TokenCreationError(ref message) => HttpResponse::InternalServerError()
                 .json(message),
+            ElogError::BadQueryParameters(ref message) => HttpResponse::BadRequest()
+                .json(message)
         }
     }
 }

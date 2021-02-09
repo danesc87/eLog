@@ -1,18 +1,13 @@
 use serde::Serialize;
 use std::collections::HashMap;
-use crate::utils::database_utils::SqlConnection;
-use diesel::{
-    QueryDsl,
-    RunQueryDsl,
-    ExpressionMethods
-};
-
 use chrono::NaiveDateTime;
 
+use crate::utils::database_utils::SqlConnection;
 use crate::utils::error_mapper::ElogError;
-use super::expense::ExpenseWithCategoriesAndPayMethods;
-use super::schema::expense;
-use super::schema::expense::dsl::*;
+use super::expense::{
+    Expense,
+    ExpenseWithCategoriesAndPayMethods
+};
 
 #[derive(Serialize)]
 pub struct ExpenseByGroup {
@@ -22,7 +17,7 @@ pub struct ExpenseByGroup {
 
 #[derive(Serialize)]
 pub struct ExpenseForReport {
-    pub expenses_by_group: Vec<ExpenseByGroup>,
+    pub expenses: Vec<ExpenseByGroup>,
     pub since_when: NaiveDateTime,
     pub until_when: NaiveDateTime,
 }
@@ -34,29 +29,16 @@ impl ExpenseForReport {
         logged_user_id: i16,
         naive_date_times: (NaiveDateTime, NaiveDateTime)
     ) -> Result<ExpenseForReport, ElogError> {
-        use super::schema::{user_category, user_pay_method};
-        let all_expenses = expense
-            .inner_join(user_category::table)
-            .inner_join(user_pay_method::table)
-            .filter(user_category::user_id.eq(user_pay_method::user_id))
-            .filter(user_category::user_id.eq(logged_user_id))
-            .filter(register_at.ge(naive_date_times.0))
-            .filter(register_at.le(naive_date_times.1))
-            .select((
-                expense::id,
-                user_category::category,
-                user_pay_method::bank_name,
-                expense::amount,
-                expense::description,
-                expense::register_at
-            ))
-            .load::<ExpenseWithCategoriesAndPayMethods>(connection)
-            .map_err(|_| { ElogError::ObjectNotFound(logged_user_id.to_string()) });
+        let all_expenses = Expense::get_all_expenses(
+            connection,
+            logged_user_id,
+            Some(naive_date_times)
+        );
         if all_expenses.is_ok() {
             let expense_map = Self::insert_or_update_category_amount_on_map(all_expenses.unwrap());
             Ok(
                 ExpenseForReport {
-                    expenses_by_group: Self::get_all_report_expenses(expense_map),
+                    expenses: Self::get_all_report_expenses(expense_map),
                     since_when: naive_date_times.0,
                     until_when: naive_date_times.1
                 }
