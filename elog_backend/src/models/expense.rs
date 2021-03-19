@@ -70,14 +70,10 @@ impl Expense {
     pub fn get_all_expenses(
         connection: &SqlConnection,
         logged_user_id: i16,
-        naive_date_times_opt: Option<(NaiveDateTime, NaiveDateTime)>
+        naive_date_times: (NaiveDateTime, NaiveDateTime)
     ) -> Result<Vec<ExpenseWithCategoriesAndPayMethods>, ElogError> {
         use super::schema::{user_category, user_pay_method};
         
-        let naive_date_times = naive_date_times_opt.unwrap_or((
-            NaiveDateTime::from_timestamp(0,0),
-            chrono::Local::now().naive_local()
-        ));
         expense
             .inner_join(user_category::table)
             .inner_join(user_pay_method::table)

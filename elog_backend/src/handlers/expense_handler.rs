@@ -42,7 +42,7 @@ pub async fn get_all_expenses(
     Expense::get_all_expenses(
         &authenticated_request.connection,
         authenticated_request.user_id,
-        Some((beggining_date, current_date))
+        (beggining_date, current_date)
     ).map(|list| {
         HttpResponse::Ok().json(list)
     })
