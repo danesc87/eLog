@@ -34,7 +34,7 @@ pub async fn insert_expense (
 pub async fn get_all_expenses(
     authenticated_request: AuthenticatedRequest
 ) -> Result<HttpResponse, ElogError> {
-    let current_date = Local::now().naive_local();
+    let current_date = Local::now().naive_utc();
     let beggining_date = NaiveDateTime::new(
         NaiveDate::from_ymd(current_date.year(), current_date.month(), 1),
         NaiveTime::from_hms_milli(0,0,0,0)
