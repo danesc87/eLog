@@ -32,7 +32,7 @@ impl ExpenseForReport {
         let all_expenses = Expense::get_all_expenses(
             connection,
             logged_user_id,
-            Some(naive_date_times)
+            naive_date_times
         );
         if all_expenses.is_ok() {
             let expense_map = Self::insert_or_update_category_amount_on_map(all_expenses.unwrap());
