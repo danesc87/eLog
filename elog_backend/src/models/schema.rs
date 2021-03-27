@@ -22,22 +22,12 @@ table! {
 }
 
 table! {
-    pay_type (id) {
-        id -> SmallInt,
-        name -> Varchar,
-        description -> Varchar,
-    }
-}
-
-table! {
-    user_pay_method (id) {
+    user_pay_type (id) {
         id -> SmallInt,
         user_id -> SmallInt,
-        pay_type_id -> SmallInt,
+        name -> Varchar,
         bank_name -> Varchar,
         description -> Varchar,
-        enabled -> Bool,
-        register_at -> Timestamp,
     }
 }
 
@@ -53,8 +43,8 @@ table! {
 table! {
     expense (id) {
         id -> Integer,
+        user_pay_type_id -> SmallInt,
         user_category_id -> SmallInt,
-        user_pay_method_id -> SmallInt,
         amount -> Double,
         description -> Varchar,
         register_at -> Timestamp,
@@ -72,6 +62,6 @@ table! {
 // Allowed Joins //
 // ############# //
 
+joinable!(expense -> user_pay_type (user_pay_type_id));
 joinable!(expense -> user_category (user_category_id));
-joinable!(expense -> user_pay_method (user_pay_method_id));
-allow_tables_to_appear_in_same_query!(expense, user_category, user_pay_method);
+allow_tables_to_appear_in_same_query!(expense, user_category, user_pay_type);

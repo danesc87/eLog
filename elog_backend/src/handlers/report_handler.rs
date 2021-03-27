@@ -10,8 +10,6 @@ use crate::utils::error_mapper::ElogError;
 use crate::authentication::AuthenticatedRequest;
 
 
-
-
 #[get("/report/expense")]
 pub async fn get_expenses_for_report(
     authenticated_request: AuthenticatedRequest,
