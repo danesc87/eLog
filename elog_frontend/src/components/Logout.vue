@@ -2,7 +2,7 @@
   <div class="container">
       <p class="pt-5">Thanks for using eLog Expenses System</p>
       <div class="pt-5">
-          <b-button :to="{name: 'home'}" variant="outline-success">Back to home</b-button>
+          <v-btn :to="{name: 'home'}" color="success" outlined>Back to home</v-btn>
       </div>
   </div>
 </template>

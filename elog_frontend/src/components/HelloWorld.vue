@@ -1,6 +1,6 @@
 <template>
   <div class="hello text-center">
-    <h1>{{ msg }}</h1>
+    <h1>eLog<br/>Expenses Management System</h1>
     <p>
       Welcome to eLog, a system designed to help you managing your expenses<br>Please visit our website
       <a href="https://blog.nano-bytes.com" target="_blank" rel="noopener"> nano-bytes.com</a>.

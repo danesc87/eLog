@@ -1,22 +1,70 @@
 <template>
-       <b-navbar toggleable="xl" type="dark" variant="dark">
-         <b-container>
-           <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
-           <b-navbar-brand v-if="user">{{user.username}}</b-navbar-brand>
-           <b-collapse id="nav-collapse" is-nav>
-            <b-navbar-nav>
-              <b-nav-item  exact>Home</b-nav-item>
-              <b-nav-item :to="{name: 'dashboard'}">About</b-nav-item>
-              <b-nav-item :to="{name: 'dashboard'}">Grid</b-nav-item>
-              <b-nav-item :to="{name: 'dashboard'}">Cards</b-nav-item>
-              <b-nav-item :to="{name: 'dashboard'}">Forms</b-nav-item>
-              <b-nav-item :to="{name: 'dashboard'}">Validaciones</b-nav-item>
-              <b-nav-item @click="logout">Logout</b-nav-item>
-            </b-navbar-nav>    
-           </b-collapse>
-         </b-container>
-       </b-navbar>
+  <v-app>
+    <v-navigation-drawer
+      v-model="drawer"
+      :mini-variant.sync="mini"
+      permanent
+    >
+      <v-list-item class="px-2 pt-2" position="center center">
 
+        <v-img v-bind:max-width="mini?40:100" src="https://smartmulticlipboard.com/images/ss/icons.png"></v-img>
+
+        <v-btn
+          icon
+          class="ml-auto"
+          @click.stop="mini = !mini"
+        >
+          <v-icon>mdi-chevron-left</v-icon>
+        </v-btn>
+      </v-list-item>
+
+      <v-list-item>
+        <v-list-item-title v-if="!mini && user">{{user.username}}</v-list-item-title>
+      </v-list-item>
+
+      <v-divider></v-divider>
+
+      <v-list dense>
+
+        <v-list-item @click.prevent="">
+          <v-list-item-icon>
+            <v-icon>mdi-home-city</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>Home</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+
+        <v-list-item @click.prevent="">
+          <v-list-item-icon>
+            <v-icon>mdi-account</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>My Account</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+
+        <v-list-item @click.prevent="">
+          <v-list-item-icon>
+            <v-icon>mdi-account-multiple</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>Users</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+
+        <v-list-item @click.prevent="logout()">
+          <v-list-item-icon>
+            <v-icon>mdi-logout</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>Logout</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+
+      </v-list>
+    </v-navigation-drawer>
+  </v-app>
 </template>
 
 <script>
@@ -25,8 +73,9 @@
   export default {
     data() {
       return {
-
-      }
+        drawer: true,
+        mini: true,
+      };
     },
     computed: {
       ...mapState('userStore',['loading', 'successMsg', 'errorMsg', 'processState', 'error', 'logged', 'user'])
@@ -38,5 +87,4 @@
 </script>
 
 <style>
-
 </style>

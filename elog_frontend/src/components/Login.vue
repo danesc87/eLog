@@ -1,40 +1,25 @@
 <template>
   <div class="form-container">
-    <b-form @submit.prevent="onSubmit({'username': form.username, 'password': form.password})" @reset="onReset" v-if="show">
-      <b-form-group id="input-group-2" label="Username:" label-for="username">
-        <b-form-input
-          id="input-2"
-          v-model="form.username"
-          required
-          placeholder="Enter username"
-        ></b-form-input>
-      </b-form-group>
-
-      <b-form-group id="input-group-3" label="Password:" label-for="text-password">
-        <b-form-input
-          id="input-3"
-          type="password"
-          v-model="form.password"
-          required
-          placeholder="Enter password"
-        ></b-form-input>
-      </b-form-group>
-      <div>
-          <b-button type="submit" variant="outline-success">Login</b-button>
-      </div>
-      <div>
-        <b-link class="text-muted" :to="{name: 'register'}" ><small>Register</small></b-link>
-      </div>
-    </b-form>
+    <v-form @submit.prevent="onSubmit({'username': form.username, 'password': form.password})" @reset="onReset" v-if="show">
+        <div class="">
+          <v-text-field label="Username" :rules="requiredField" type="text" v-model="form.username"/>
+          <v-text-field label="Password" :rules="requiredField" type="password" v-model="form.password"/>
+        </div>
+        <div class="text-center pt-5">
+          <v-btn type="submit" color="success" :disabled="!valid" outlined>Login</v-btn>
+        </div>
+        <div>
+          <a class="text-muted" href="/register"><small>Register</small></a>
+        </div>
+    </v-form>
     <div class="text-center pt-2" v-if="loading">
-      <b-button variant="success" disabled>
-      <b-spinner small type="grow"></b-spinner>
+      <v-btn color="success" disabled>
         Loading...
-      </b-button>
+      </v-btn>
     </div>
-      <p class="text-center text-danger pt-2" v-if="error">{{errorMsg}}</p><div class="pt-5">
-          <b-button :to="{name: 'home'}" variant="outline-success">Back to home</b-button>
-      </div>
+    <div class="pt-5">
+      <p class="text-center text-danger pt-2" v-if="error">{{errorMsg}}</p>
+    </div>
   </div>
 </template>
 
@@ -44,11 +29,15 @@
   export default {
     data() {
       return {
+        valid: true,
         form: {
           username: '',
           password: '',
         },
-        show: true
+        show: true,
+        requiredField: [
+          v => !!v || 'This field is required'
+        ]
       }
     },
     computed: {

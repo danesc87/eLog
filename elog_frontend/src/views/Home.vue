@@ -1,10 +1,10 @@
 <template>
-  <div class="container home text-center pt-5">
+  <v-main class="text-center pt-5">
     <img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="eLog Expenses System" class="pt-5"/>
+    <HelloWorld msg="eLog Expenses Management System" class="pt-5"/>
     <Login/>
     <Footer/>
-  </div>
+  </v-main>
 </template>
 
 <script>

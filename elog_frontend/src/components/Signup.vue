@@ -1,67 +1,32 @@
 <template>
   <div class="form-container">
-    <b-form @submit.prevent="register(form.AppUser)" @reset="onReset">
-      <b-form-group id="input-group-1" label="Email:" label-for="email">
-        <b-form-input
-          id="email"
-          v-model="form.AppUser.email"
-          required
-          placeholder="Enter email"
-        ></b-form-input>
-      </b-form-group>
-      <b-form-group id="input-group-1" label="Full Name:" label-for="name">
-        <b-form-input
-          id="firstname"
-          v-model="form.AppUser.first_name"
-          required
-          placeholder="First Name"
-        ></b-form-input>
 
-        <b-form-input
-          id="lastname"
-          v-model="form.AppUser.last_name"
-          required
-          placeholder="Last Name"
-        ></b-form-input>
-      </b-form-group>
+    <v-form @submit.prevent="onSubmit()" @reset="onReset">
+        <div class="">
+          <v-text-field label="Email" :rules="requiredField" type="email" v-model="form.AppUser.email"/>
+          <v-text-field label="First Name" :rules="requiredField" type="text" v-model="form.AppUser.first_name"/>
+          <v-text-field label="Last Name" :rules="requiredField" type="text" v-model="form.AppUser.last_name"/>
+          <v-text-field label="Username" :rules="requiredField" type="text" v-model="form.AppUser.username"/>
+          <v-text-field label="Password" :rules="requiredField" type="password" v-model="form.AppUser.password"/>
+        </div>
+        <div class="text-center pt-5">
+          <v-btn type="submit" color="success" :disabled="!valid" outlined>Register</v-btn>
+        </div>
+    </v-form>
 
-      <b-form-group id="input-group-2" label="Username:" label-for="username">
-        <b-form-input
-          id="username"
-          v-model="form.AppUser.username"
-          required
-          placeholder="Enter username"
-        ></b-form-input>
-      </b-form-group>
-
-      <b-form-group id="input-group-3" label="Password:" label-for="text-password">
-        <b-form-input
-          id="input-5"
-          type="password"
-          v-model="form.AppUser.password"
-          required
-          placeholder="Enter password"
-        ></b-form-input>
-      </b-form-group>
-      <div>
-          <b-button type="submit" variant="outline-success">Submit</b-button>
-      </div>
-    </b-form>
     <div class="text-center pt-2" v-if="loading">
-        <b-button variant="success" disabled>
-        <b-spinner small type="grow"></b-spinner>
-          Loading...
-        </b-button>
-      </div>
-        <p class="text-center text-danger pt-2" v-if="error">{{errorMsg}}</p>
-        <b-modal ref="register-modal" no-close-on-backdrop no-close-on-esc hide-footer v-model="processState" @close="onReset">
-          <template class="text-center" #modal-title>
-            {{successMsg}}
-          </template>
-          <b-button class="btn-success mt-3" block @click="onReset">OK</b-button>
-        </b-modal>
-        <div class="pt-5">
-          <b-button :to="{name: 'home'}" variant="outline-success">Back to home</b-button>
+        <v-progress-circular
+        indeterminate
+        color="success"
+      ></v-progress-circular>
+    </div>
+      <p class="text-center text-danger pt-2" v-if="error">{{errorMsg}}</p>
+      <v-alert
+        type="success"
+        v-if="processState"
+      >{{successMsg}}</v-alert>
+      <div class="pt-2">
+        <v-btn :to="{name: 'home'}" color="success" outlined>Back to home</v-btn>
       </div>
   </div>
 </template>
@@ -73,9 +38,13 @@
   export default {
     data() {
       return {
+        valid: true,
         form: {
             AppUser
-        }
+        },
+        requiredField: [
+          v => !!v || 'This field is required'
+        ]
       }
     },
     computed: {
@@ -83,15 +52,21 @@
     },
     methods: {
       ...mapActions('userStore',['register', 'cleanAll']),
-      onReset(evt) {
-        evt.preventDefault();
-        this.form.AppUser.first_name = '';
-        this.form.AppUser.last_name = '';
-        this.form.AppUser.username = '';
-        this.form.AppUser.email = '';
-        this.form.AppUser.password = '';
-        this.cleanAll();
-        this.$router.push({name: 'home'});
+      onSubmit(){
+        this.register(this.form.AppUser);
+        this.onReset();
+      },
+      onReset() {
+        console.log(this.processState);
+        if(this.processState){
+          this.form.AppUser.first_name = '';
+          this.form.AppUser.last_name = '';
+          this.form.AppUser.username = '';
+          this.form.AppUser.email = '';
+          this.form.AppUser.password = '';
+          this.cleanAll();
+          this.$router.push({name: 'home'});
+        }
       }
     }
   }
