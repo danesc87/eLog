@@ -33,7 +33,7 @@ pub struct NewExpense {
     pub description: String
 }
 
-// Default implementation lets send JSON body without user_pay_method_id
+// Default implementation lets send JSON body without user_category_id neither user_pay_method_id
 impl Default for NewExpense {
     fn default() -> Self {
         NewExpense {
@@ -73,7 +73,7 @@ impl Expense {
         naive_date_times: (NaiveDateTime, NaiveDateTime)
     ) -> Result<Vec<ExpenseWithCategoriesAndPayMethods>, ElogError> {
         use super::schema::{user_category, user_pay_method};
-        
+
         expense
             .inner_join(user_category::table)
             .inner_join(user_pay_method::table)
