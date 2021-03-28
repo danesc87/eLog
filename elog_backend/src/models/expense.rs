@@ -16,8 +16,8 @@ use super::schema::expense::dsl::*;
 #[derive(Queryable, Serialize, Deserialize)]
 pub struct Expense {
     pub id: i32,
+    pub user_pay_type_id: i16,
     pub user_category_id: i16,
-    pub user_pay_method_id: i16,
     pub amount: f64,
     pub description: String,
     pub register_date: NaiveDateTime
@@ -27,18 +27,18 @@ pub struct Expense {
 #[serde(default)]
 #[table_name = "expense"]
 pub struct NewExpense {
+    pub user_pay_type_id: i16,
     pub user_category_id: i16,
-    pub user_pay_method_id: i16,
     pub amount: f64,
     pub description: String
 }
 
-// Default implementation lets send JSON body without user_category_id neither user_pay_method_id
+// Default implementation lets send JSON body without user_category_id neither user_pay_type_id
 impl Default for NewExpense {
     fn default() -> Self {
         NewExpense {
+            user_pay_type_id: 0,
             user_category_id: 0,
-            user_pay_method_id: 0,
             amount: 0.0,
             description: String::from("")
         }
@@ -46,10 +46,10 @@ impl Default for NewExpense {
 }
 
 #[derive(Queryable, Serialize)]
-pub struct ExpenseWithCategoriesAndPayMethods {
+pub struct ExpenseWithCategoriesAndPayTypes {
     pub id: i32,
+    pub user_pay_type: String,
     pub user_category: String,
-    pub user_pay_method: String,
     pub amount: f64,
     pub description: String,
     pub register_date: NaiveDateTime
@@ -71,24 +71,24 @@ impl Expense {
         connection: &SqlConnection,
         logged_user_id: i16,
         naive_date_times: (NaiveDateTime, NaiveDateTime)
-    ) -> Result<Vec<ExpenseWithCategoriesAndPayMethods>, ElogError> {
-        use super::schema::{user_category, user_pay_method};
+    ) -> Result<Vec<ExpenseWithCategoriesAndPayTypes>, ElogError> {
+        use super::schema::{user_category, user_pay_type};
 
         expense
             .inner_join(user_category::table)
-            .inner_join(user_pay_method::table)
-            .filter(user_category::user_id.eq(user_pay_method::user_id))
+            .inner_join(user_pay_type::table)
+            .filter(user_category::user_id.eq(user_pay_type::user_id))
             .filter(user_category::user_id.eq(logged_user_id))
             .filter(register_at.between(naive_date_times.0, naive_date_times.1))
             .select((
                 expense::id,
                 user_category::category,
-                user_pay_method::bank_name,
+                user_pay_type::bank_name,
                 expense::amount,
                 expense::description,
                 expense::register_at
             ))
-            .load::<ExpenseWithCategoriesAndPayMethods>(connection)
+            .load::<ExpenseWithCategoriesAndPayTypes>(connection)
             .map_err(|_| { ElogError::ObjectNotFound(logged_user_id.to_string()) })
     }
 }

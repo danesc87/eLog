@@ -4,29 +4,30 @@ use actix_web::{
     get,
     post
 };
-use crate::models::pay_type::{
-    PayType,
-    NewPayType
+use crate::models::user_pay_type::{
+    UserPayType,
+    NewUserPayType
 };
 
 use crate::utils::error_mapper::ElogError;
 use crate::authentication::AuthenticatedRequest;
 
-#[post("/pay_type")]
+#[post("/user_pay_type")]
 pub async fn insert_pay_type (
     authenticated_request: AuthenticatedRequest,
-    pay_type: web::Json<NewPayType>
+    mut new_user_pay_type: web::Json<NewUserPayType>
 ) -> Result<HttpResponse, ElogError> {
-    PayType::insert(&authenticated_request.connection, pay_type.0).map(|_| {
+    new_user_pay_type.user_id = authenticated_request.user_id;
+    UserPayType::insert(&authenticated_request.connection, new_user_pay_type.0).map(|_| {
         HttpResponse::Created().finish()
     })
 }
 
-#[get("/pay_type")]
+#[get("/user_pay_type")]
 pub async fn get_all_pay_types(
     authenticated_request: AuthenticatedRequest
 ) -> Result<HttpResponse, ElogError> {
-    PayType::get_list(&authenticated_request.connection).map(|list| {
+    UserPayType::get_list(&authenticated_request.connection).map(|list| {
         HttpResponse::Ok().json(list)
     })
 }

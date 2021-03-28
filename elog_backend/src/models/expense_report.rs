@@ -6,7 +6,7 @@ use crate::utils::database_utils::SqlConnection;
 use crate::utils::error_mapper::ElogError;
 use super::expense::{
     Expense,
-    ExpenseWithCategoriesAndPayMethods
+    ExpenseWithCategoriesAndPayTypes
 };
 
 #[derive(Serialize)]
@@ -49,7 +49,7 @@ impl ExpenseForReport {
     }
 
     fn insert_or_update_category_amount_on_map(
-        all_expenses: Vec<ExpenseWithCategoriesAndPayMethods>
+        all_expenses: Vec<ExpenseWithCategoriesAndPayTypes>
     ) -> HashMap<String, f64> {
         let mut expense_map: HashMap<String, f64> = HashMap::new();
         for each_expense in &all_expenses {
