@@ -3,6 +3,8 @@
 This repo contains the REST backend for **eLog** expenses manager. It's built upon Rust, Actix, Diesel and MariaDB, but it can work with SQLite3 and PostgreSQL as well.
 
 ### Requirements
+
+```
 - Rust
 - MariaDB
 - Development Requirements
@@ -14,6 +16,7 @@ This repo contains the REST backend for **eLog** expenses manager. It's built up
     - libsqlite3-dev (Debian/Ubuntu)
 
 - Env File
+```
 
 ### Init MariaDB
 
@@ -32,9 +35,15 @@ mysql -h 127.0.0.1 -u root -p{password}
 
 ```mysql
 CREATE DATABASE {db_name} DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;
-GRANT ALL PRIVILEGES ON {db_name}.* TO "root"@"localhost" IDENTIFIED BY "1234abcd";
+GRANT ALL PRIVILEGES ON {db_name}.* TO "{user_name}"@"{db_host}" IDENTIFIED BY "{password}";
 ```
 
+> `{password}, {db_name}, {user_name} and {db_host}`  
+> are variables and they should be replaced with your own i.e.  
+> `{password} -> 1234abcd`  
+> `{db_name} -> dev_database`  
+> `{user_name} -> dev_user`  
+> `{db_host} -> localhost`
 
 ### Env file
 
@@ -54,6 +63,9 @@ POOL_SIZE=6
 JWT_SECRET=elog-super-secret-key
 TOKEN_DURATION_MIN=60
 ```
+
+> According to samples below `DB_URL` will be something like this:  
+> `mysql:://dev_user:1234abcd@127.0.0.1:3306/dev_database`
 
 ### Release
 
@@ -161,7 +173,7 @@ Always Ok with following body
 Request
 
 ```
-path: /pay_type
+path: /user_pay_type
 method: POST
 headers: Bearer token
 ```
@@ -171,6 +183,7 @@ Body
 ```json
 {
 	"name": "Credit Card",
+	"bank_name": "Awesome Bank",
 	"description": "Credit Card"
 }
 ```
@@ -180,7 +193,7 @@ Body
 Request
 
 ```
-path: /pay_type
+path: /user_pay_type
 method: GET
 headers: Bearer token
 ```
@@ -191,54 +204,10 @@ Response
 [
   {
     "id": 1,
-    "name": "Credit Card",
-    "description": "Credit Card"
-  }
-]
-```
-
-#### insert_user_pay_method
-
-Request
-
-```
-path: /user_pay_method/{pay_type_id}
-method: POST
-headers: Bearer token
-```
-
-Body
-
-```json
-{
-	"bank_name": "Bank Name",
-	"description": "Pay method description",
-	"enabled": true
-}
-```
-
-#### get_user_pay_methods
-
-Request
-
-```
-path: /user_pay_method
-method: GET
-headers: Bearer token
-```
-
-Response
-
-```json
-[
-  {
-    "id": 5,
     "user_id": 1,
-    "pay_type_id": 1,
-    "bank_name": "Bank Name",
-    "description": "Pay method description",
-    "enabled": true,
-    "register_date": "2020-11-24T00:56:36"
+    "name": "Credit Card",
+    "bank_name": "Awesome Bank",
+    "description": "Credit Card"
   }
 ]
 ```
@@ -290,7 +259,7 @@ Response
 Request
 
 ```
-path: /expense/{user_category_id}/{user_pay_method_id}
+path: /expense/{user_pay_type_id}/{user_category_id}
 method: POST
 headers: Bearer token
 ```
@@ -320,16 +289,16 @@ Response
 [
   {
     "id": 18,
+    "user_pay_type": "Credit Card",
     "user_category": "Alcohol",
-    "user_pay_method": "Bank",
     "amount": 40.6,
     "description": "Whisky",
     "register_date": "2020-12-01T23:45:03"
   },
   {
     "id": 19,
+    "user_pay_type": "Debit Card",
     "user_category": "Supermarket",
-    "user_pay_method": "Credit Card",
     "amount": 63.07,
     "description": "Supermarket",
     "register_date": "2020-12-01T23:45:47"
