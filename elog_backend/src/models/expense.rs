@@ -33,7 +33,7 @@ pub struct NewExpense {
     pub description: String
 }
 
-// Default implementation lets send JSON body without user_category_id neither user_pay_type_id
+// Default implementation lets send JSON body without user_pay_type_id nor user_category_id
 impl Default for NewExpense {
     fn default() -> Self {
         NewExpense {
@@ -82,8 +82,8 @@ impl Expense {
             .filter(register_at.between(naive_date_times.0, naive_date_times.1))
             .select((
                 expense::id,
+                user_pay_type::name,
                 user_category::category,
-                user_pay_type::bank_name,
                 expense::amount,
                 expense::description,
                 expense::register_at

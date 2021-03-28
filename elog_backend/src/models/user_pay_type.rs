@@ -28,7 +28,7 @@ pub struct NewUserPayType {
     pub description: String
 }
 
-// Default implementation lets send JSON body without user_category_id neither user_pay_type_id
+// Default implementation lets send JSON body without user_id
 impl Default for NewUserPayType {
     fn default() -> Self {
         NewUserPayType {
