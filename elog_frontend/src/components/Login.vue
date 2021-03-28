@@ -101,6 +101,7 @@
       onReset(){
         this.username = '';
         this.password = '';
+        this.$v.$reset()
         this.cleanAll();
       },
       submit() {
