@@ -6,7 +6,7 @@
             </div>
         </footer>
     </small> -->
-    <v-footer color="transparent" absolute class="aling-self-end">
+    <v-footer color="transparent" absolute class="aling-self-flex-end">
         <v-col
         class="text-center"
         cols="12"

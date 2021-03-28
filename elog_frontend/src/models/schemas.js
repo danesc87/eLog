@@ -6,3 +6,18 @@ export var AppUser = {
     email: null,
     password: null
 }
+
+export var AppUserDefinitions = {
+    first_name: {
+        maxLength: 100
+    },
+    last_name: {
+        maxLength: 100
+    },
+    username: {
+        maxLength: 100
+    },
+    password: {
+        maxLength: 255
+    }
+}
