@@ -58,7 +58,7 @@ impl Claims {
 
     fn with_app_user(app_user: &AppUser) -> Self {
         use chrono::Local;
-        let token_duration = crate::utils::env_variable_utils::get_variable_as_integer("TOKEN_DURATION_MIN");
+        let token_duration = crate::ElogConfig::new().token.duration;
 
         Claims {
             id: app_user.id,
@@ -104,6 +104,6 @@ impl Claims {
     }
 
     fn get_jwt_secret_key() -> String {
-        crate::utils::env_variable_utils::get_variable("JWT_SECRET")
+        crate::ElogConfig::new().token.jwt_secret
     }
 }

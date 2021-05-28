@@ -8,26 +8,26 @@ use actix_web::{
 extern crate diesel;
 #[macro_use]
 extern crate failure;
-#[macro_use]
-extern crate lazy_static;
 
-mod config;
+mod route_config;
+mod server_config;
 mod authentication;
 mod handlers;
 mod models;
 mod utils;
-use config::route_config;
-use config::get_cors;
+use route_config::routes;
+use route_config::get_cors;
 use utils::database_utils::connect_database;
-use utils::env_variable_utils::get_variable;
+use server_config::ElogConfig;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    // Init Dotenv and EnvLogger
-    dotenv::dotenv().ok();
-    env_logger::init();
+    let elog_config = ElogConfig::new();
+    std::env::set_var("RUST_LOG", elog_config.log_type);
 
-    let server_url = format!("{}:{}", get_variable("SERVER_IP"), get_variable("SERVER_PORT"));
+    // Init EnvLogger
+    env_logger::init();
+    let server_url = format!("{}:{}", elog_config.ip_address, elog_config.server_port);
     println!("\nServer Running on: {}\n", server_url);
 
     // Start HTTP server
@@ -36,7 +36,7 @@ async fn main() -> std::io::Result<()> {
             .wrap(Logger::default())
             .wrap(get_cors())
             .data(connect_database())
-            .configure(route_config)
+            .configure(routes)
     })
     .bind(server_url)?
     .run()

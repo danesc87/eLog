@@ -19,5 +19,5 @@
 *.atom-dbg.cson
 *.vscode
 
-# Env Files
-*.env
+# eLog config files
+elog.yml
