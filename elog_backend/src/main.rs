@@ -8,6 +8,8 @@ use actix_web::{
 extern crate diesel;
 #[macro_use]
 extern crate failure;
+#[macro_use]
+extern crate lazy_static;
 
 mod route_config;
 mod server_config;
@@ -18,16 +20,19 @@ mod utils;
 use route_config::routes;
 use route_config::get_cors;
 use utils::database_utils::connect_database;
-use server_config::ElogConfig;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    let elog_config = ElogConfig::new();
-    std::env::set_var("RUST_LOG", elog_config.log_type);
-
+    // Put log type as env variable, since env_logger use it
+    std::env::set_var("RUST_LOG", server_config::ELOG_CONFIG.clone().log_type);
     // Init EnvLogger
     env_logger::init();
-    let server_url = format!("{}:{}", elog_config.ip_address, elog_config.server_port);
+
+    let server_url = format!(
+        "{}:{}",
+        server_config::ELOG_CONFIG.ip_address,
+        server_config::ELOG_CONFIG.server_port
+    );
     println!("\nServer Running on: {}\n", server_url);
 
     // Start HTTP server

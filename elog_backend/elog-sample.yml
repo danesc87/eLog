@@ -12,7 +12,7 @@ ip_address: 0.0.0.0
 # Port where eLog backend will listen
 server_port: 8090
 # Log type and level could be something like:
-# ERRO, WARN, INFO, DEBUG, TRACE
+# ERROR, WARN, INFO, DEBUG, TRACE
 # or have specified a library like:
 # actix_web=DEBUG, actix_web=INFO
 log_type: DEBUG

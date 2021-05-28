@@ -58,7 +58,7 @@ impl Claims {
 
     fn with_app_user(app_user: &AppUser) -> Self {
         use chrono::Local;
-        let token_duration = crate::ElogConfig::new().token.duration;
+        let token_duration = crate::server_config::ELOG_CONFIG.token.duration;
 
         Claims {
             id: app_user.id,
@@ -104,6 +104,6 @@ impl Claims {
     }
 
     fn get_jwt_secret_key() -> String {
-        crate::ElogConfig::new().token.jwt_secret
+        crate::server_config::ELOG_CONFIG.clone().token.jwt_secret
     }
 }

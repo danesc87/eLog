@@ -3,7 +3,14 @@ use config::ConfigError;
 
 const CONFIG_FILE_NAME: &str = "elog.yml";
 
-#[derive(Deserialize, Debug)]
+// This lazy_static allows to have some sort of global singleton
+// to access from other modules to the same configuration without creating new instances
+lazy_static! {
+    pub static ref ELOG_CONFIG: ElogConfig = ElogConfig::new();
+}
+
+
+#[derive(Deserialize, Debug, Clone)]
 pub struct ElogDataBase {
     pub db_url: String,
     pub pool_size: u32,
@@ -19,7 +26,7 @@ impl Default for ElogDataBase {
 
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Clone)]
 pub struct ElogTokenConfig {
     pub jwt_secret: String,
     pub duration: u16
@@ -34,7 +41,7 @@ impl Default for ElogTokenConfig {
     }
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Clone)]
 pub struct ElogConfig {
     pub ip_address: String,
     pub server_port: u16,
@@ -56,6 +63,11 @@ impl Default for ElogConfig {
 }
 
 impl ElogConfig {
+
+    // New instance of ElogConfig
+    // gets current filepath with file name included "elog.yml"
+    // then tries to get configuration
+    // if something happens will get Default config for all properties
     pub fn new() -> Self {
         let file_path = std::env::current_dir().unwrap();
         let full_config_path = format!(
@@ -64,23 +76,23 @@ impl ElogConfig {
             CONFIG_FILE_NAME
         );
 
-        match Self::get_settings(full_config_path.as_str()) {
+        match Self::get_configuration(full_config_path.as_str()) {
             Ok(config) => config,
-            Err(_err) => {
-                println!("{}\nDefault config will be used!\n", _err);
+            Err(_error) => {
+                println!("\n- Default config will be used due to:\n\t{}\n", _error);
                 Self::default()
             }
         }
     }
 
-    fn get_settings(file_path: &str) -> Result<Self, ConfigError> {
+    fn get_configuration(file_path: &str) -> Result<Self, ConfigError> {
         use config::{Config, File};
 
         let mut config = Config::new();
         match config.merge(File::with_name(file_path)) {
             Ok(_) => config.try_into(),
             Err(_error) => {
-                println!("{}\nDefault config will be used!\n", _error);
+                println!("\n- Default config will be used due to:\n\t{}\n", _error);
                 Ok(Self::default())
             }
         }

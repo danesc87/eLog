@@ -17,7 +17,7 @@ pub type SqlPool = Pool<ConnectionManager<SqlConnection>>;
 pub type SqlPooledConnection = PooledConnection<ConnectionManager<SqlConnection>>;
 
 pub fn connect_database() -> SqlPool {
-    let elog_db_config = crate::ElogConfig::new().database;
+    let elog_db_config = crate::server_config::ELOG_CONFIG.clone().database;
     let manager = ConnectionManager::<SqlConnection>::new(elog_db_config.db_url);
     Pool::builder()
         .max_size(elog_db_config.pool_size)
