@@ -6,7 +6,6 @@ use diesel::mysql::MysqlConnection;
 use diesel::r2d2::{
     ConnectionManager,
     Pool,
-    PoolError,
     PooledConnection
 };
 
@@ -18,14 +17,12 @@ pub type SqlPool = Pool<ConnectionManager<SqlConnection>>;
 pub type SqlPooledConnection = PooledConnection<ConnectionManager<SqlConnection>>;
 
 pub fn connect_database() -> SqlPool {
-    let db_url = super::env_variable_utils::get_variable("DB_URL");
-    init_database(db_url.as_str()).expect("Error during connection to Data Base!")
-}
-
-fn init_database(database_url: &str) -> Result<SqlPool, PoolError> {
-    let manager = ConnectionManager::<SqlConnection>::new(database_url);
-    let pool_size = super::env_variable_utils::get_variable_as_integer("POOL_SIZE");
-    Pool::builder().max_size(pool_size).build(manager)
+    let elog_db_config = crate::server_config::ELOG_CONFIG.clone().database;
+    let manager = ConnectionManager::<SqlConnection>::new(elog_db_config.db_url);
+    Pool::builder()
+        .max_size(elog_db_config.pool_size)
+        .build(manager)
+        .expect("Error during connection to Data Base!")
 }
 
 pub fn pool_handler(

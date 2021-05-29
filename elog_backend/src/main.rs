@@ -11,23 +11,28 @@ extern crate failure;
 #[macro_use]
 extern crate lazy_static;
 
-mod config;
+mod route_config;
+mod server_config;
 mod authentication;
 mod handlers;
 mod models;
 mod utils;
-use config::route_config;
-use config::get_cors;
+use route_config::routes;
+use route_config::get_cors;
 use utils::database_utils::connect_database;
-use utils::env_variable_utils::get_variable;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    // Init Dotenv and EnvLogger
-    dotenv::dotenv().ok();
+    // Put log type as env variable, since env_logger use it
+    std::env::set_var("RUST_LOG", server_config::ELOG_CONFIG.clone().log_type);
+    // Init EnvLogger
     env_logger::init();
 
-    let server_url = format!("{}:{}", get_variable("SERVER_IP"), get_variable("SERVER_PORT"));
+    let server_url = format!(
+        "{}:{}",
+        server_config::ELOG_CONFIG.ip_address,
+        server_config::ELOG_CONFIG.server_port
+    );
     println!("\nServer Running on: {}\n", server_url);
 
     // Start HTTP server
@@ -36,7 +41,7 @@ async fn main() -> std::io::Result<()> {
             .wrap(Logger::default())
             .wrap(get_cors())
             .data(connect_database())
-            .configure(route_config)
+            .configure(routes)
     })
     .bind(server_url)?
     .run()

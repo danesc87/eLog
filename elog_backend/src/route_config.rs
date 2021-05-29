@@ -6,7 +6,7 @@ pub fn get_cors() -> Cors {
 }
 
 // Endpoints registration config
-pub fn route_config(config: &mut web::ServiceConfig) {
+pub fn routes(config: &mut web::ServiceConfig) {
     // Only imports of Endpoints
     use crate::handlers::{
         app_user_handler::{

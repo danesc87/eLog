@@ -2,7 +2,7 @@
 
 This repo contains the REST backend for **eLog** expenses manager. It's built upon Rust, Actix, Diesel and MariaDB, but it can work with SQLite3 and PostgreSQL as well.
 
-### Requirements
+## Requirements
 
 ```
 - Rust
@@ -15,7 +15,7 @@ This repo contains the REST backend for **eLog** expenses manager. It's built up
     - sqlite3-devel (openSUSE)
     - libsqlite3-dev (Debian/Ubuntu)
 
-- Env File
+- Config File
 ```
 
 ### Init MariaDB
@@ -45,33 +45,45 @@ GRANT ALL PRIVILEGES ON {db_name}.* TO "{user_name}"@"{db_host}" IDENTIFIED BY "
 > `{user_name} -> dev_user`  
 > `{db_host} -> localhost`
 
-### Env file
+### Config file
 
-`.env` file should be as follows:
+**eLog** config file must be called `elog.yml` and be placed on the same file path as *elog_backend* binary, this config file should be as follows:
 
-```
-# Server Things
-SERVER_IP=0.0.0.0
-SERVER_PORT=8090
-RUST_LOG=actix_web=debug
-
-# DB Data
-DB_URL=mysql://user:pass@ip:port/db_name
-POOL_SIZE=6
-
-# Token
-JWT_SECRET=elog-super-secret-key
-TOKEN_DURATION_MIN=60
+```yml
+# Ip address of eLog backend 0.0.0.0 means can accept connections from everywhere
+ip_address: 0.0.0.0
+# Port where eLog backend will listen
+server_port: 8090
+# Log type and level could be something like:
+# ERROR, WARN, INFO, DEBUG, TRACE
+# or have specified a library like:
+# actix_web=DEBUG, actix_web=INFO
+log_type: DEBUG
+# Database config
+database:
+  # URL of database for eLog, should contain:
+  # user, pass, ip address, port and db schema
+  db_url: mysql://user:pass@ip:port/db_name
+  # Connection pool allow maximum number of connections managed by the pool
+  pool_size: 6
+# Token config
+token:
+  # Super secret key for encoding tokens
+  jwt_secret: elog-super-secret-key
+  # Duration in minutes
+  duration: 60
 ```
 
 > According to samples below `DB_URL` will be something like this:  
 > `mysql:://dev_user:1234abcd@127.0.0.1:3306/dev_database`
 
-### Release
+You can find a sample version called `elog-sample.yml` in this repo.
+
+## Release
 
 Release version should be changed because it'll be a hardcoded String in `session_properties.rs` file
 
-### Run
+## Run
 
 Run eLog Backend
 
@@ -79,7 +91,7 @@ Run eLog Backend
 cargo run
 ```
 
-### Build
+## Build
 
 Build eLog Backend with **debug** compatibility
 
@@ -87,7 +99,7 @@ Build eLog Backend with **debug** compatibility
 cargo build
 ```
 
-### Endpoints
+## Endpoints
 
 This has a sample of the current endpoints and how they work
 
