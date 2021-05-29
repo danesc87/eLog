@@ -79,6 +79,13 @@ impl AppUser {
     pub fn logout(connection: &SqlConnection, string_token: &str) -> Result<usize, ElogError> {
         Claims::invalidate_token(connection, string_token)
     }
+
+    pub fn get_app_user_data(connection: &SqlConnection, app_user_id: i16) -> Result<AppUser, ElogError> {
+        app_user
+            .filter(id.eq(app_user_id))
+            .get_result(connection)
+            .map_err(|_| { ElogError::ObjectNotFound(app_user_id.to_string()) })
+    }
 }
 
 // Base64 Decode Sample
