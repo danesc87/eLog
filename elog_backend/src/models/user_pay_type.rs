@@ -2,18 +2,20 @@ use serde::{Deserialize, Serialize};
 use crate::utils::database_utils::SqlConnection;
 use diesel::{
     insert_into,
+    delete,
     QueryDsl,
-    RunQueryDsl
+    RunQueryDsl,
+    ExpressionMethods
 };
 use crate::utils::error_mapper::ElogError;
 
 use super::schema::user_pay_type;
 use super::schema::user_pay_type::dsl::*;
 
+// This Struct is only for showing data on endpoint
 #[derive(Queryable, Serialize, Deserialize)]
 pub struct UserPayType {
     pub id: i16,
-    pub user_id: i16,
     pub name: String,
     pub bank_name: String,
     pub description: String
@@ -41,15 +43,6 @@ impl Default for NewUserPayType {
     }
 }
 
-// This Struct is only for showing data on endpoint
-#[derive(Queryable, Serialize)]
-pub struct ObtainedUserPayType {
-    pub id: i16,
-    pub name: String,
-    pub bank_name: String,
-    pub description: String
-}
-
 impl UserPayType {
 
     pub fn insert(
@@ -62,7 +55,7 @@ impl UserPayType {
             .map_err(|error| { ElogError::InsertFailure(error.to_string()) })
     }
 
-    pub fn get_list(connection: &SqlConnection) -> Result<Vec<ObtainedUserPayType>, ElogError> {
+    pub fn get_list(connection: &SqlConnection) -> Result<Vec<UserPayType>, ElogError> {
         user_pay_type
             .select((
                 user_pay_type::id,
@@ -70,7 +63,13 @@ impl UserPayType {
                 user_pay_type::bank_name,
                 user_pay_type::description
             ))
-            .load::<ObtainedUserPayType>(connection)
+            .load::<UserPayType>(connection)
             .map_err(|error| { ElogError::ErrorRetrievingData(error.to_string()) })
+    }
+
+    pub fn delete_by_id(connection: &SqlConnection, user_pay_type_id: i16) -> Result<usize, ElogError> {
+        delete(user_pay_type.filter(id.eq(user_pay_type_id)))
+            .execute(connection)
+            .map_err(|error| { ElogError::ObjectNotFound(error.to_string()) })
     }
 }

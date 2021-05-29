@@ -2,7 +2,8 @@ use actix_web::{
     HttpResponse,
     web,
     get,
-    post
+    post,
+    delete
 };
 use crate::models::user_category::{
     UserCategory,
@@ -36,5 +37,15 @@ pub async fn get_all_user_categories(
         authenticated_request.user_id
     ).map(|list| {
         HttpResponse::Ok().json(list)
+    })
+}
+
+#[delete("/user_category/{user_category_id}")]
+pub async fn delete_user_category(
+    authenticated_request: AuthenticatedRequest,
+    dynamic_path: web::Path<(i16,)>,
+) -> Result<HttpResponse, ElogError> {
+    UserCategory::delete_by_id(&authenticated_request.connection, dynamic_path.into_inner().0).map(|_| {
+        HttpResponse::Ok().finish()
     })
 }

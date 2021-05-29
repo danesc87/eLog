@@ -17,11 +17,13 @@ pub fn routes(config: &mut web::ServiceConfig) {
         },
         user_pay_type_handler::{
             insert_pay_type,
-            get_all_pay_types
+            get_all_pay_types,
+            delete_user_pay_type
         },
         user_category_handler::{
             insert_user_category,
-            get_all_user_categories
+            get_all_user_categories,
+            delete_user_category
         },
         expense_handler::{
             insert_expense,
@@ -37,8 +39,10 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(session_properties)
         .service(insert_pay_type)
         .service(get_all_pay_types)
+        .service(delete_user_pay_type)
         .service(insert_user_category)
         .service(get_all_user_categories)
+        .service(delete_user_category)
         .service(insert_expense)
         .service(get_all_expenses)
         .service(get_expenses_for_report);

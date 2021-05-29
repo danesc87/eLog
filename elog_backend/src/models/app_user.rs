@@ -1,8 +1,8 @@
 use serde::{Deserialize, Serialize};
 use crate::utils::database_utils::SqlConnection;
 use diesel::{
-    QueryDsl,
     insert_into,
+    QueryDsl,
     RunQueryDsl,
     ExpressionMethods
 };
