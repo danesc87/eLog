@@ -33,7 +33,7 @@ pub struct NewExpense {
     pub description: String
 }
 
-// Default implementation lets send JSON body without user_pay_type_id nor user_category_id
+// Default implementation, lets send JSON body without user_pay_type_id nor user_category_id
 impl Default for NewExpense {
     fn default() -> Self {
         NewExpense {
@@ -45,6 +45,7 @@ impl Default for NewExpense {
     }
 }
 
+// Struct for show expenses on endpoints /expense and /report/expense
 #[derive(Queryable, Serialize)]
 pub struct ExpenseWithCategoriesAndPayTypes {
     pub id: i32,

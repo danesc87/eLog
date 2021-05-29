@@ -2,6 +2,7 @@ use serde::{Deserialize, Serialize};
 use crate::utils::database_utils::SqlConnection;
 use diesel::{
     insert_into,
+    QueryDsl,
     RunQueryDsl
 };
 use crate::utils::error_mapper::ElogError;
@@ -28,7 +29,7 @@ pub struct NewUserPayType {
     pub description: String
 }
 
-// Default implementation lets send JSON body without user_id
+// Default implementation, lets send JSON body without user_id
 impl Default for NewUserPayType {
     fn default() -> Self {
         NewUserPayType {
@@ -40,6 +41,14 @@ impl Default for NewUserPayType {
     }
 }
 
+// This Struct is only for showing data on endpoint
+#[derive(Queryable, Serialize)]
+pub struct ObtainedUserPayType {
+    pub id: i16,
+    pub name: String,
+    pub bank_name: String,
+    pub description: String
+}
 
 impl UserPayType {
 
@@ -53,9 +62,15 @@ impl UserPayType {
             .map_err(|error| { ElogError::InsertFailure(error.to_string()) })
     }
 
-    pub fn get_list(connection: &SqlConnection) -> Result<Vec<UserPayType>, ElogError> {
+    pub fn get_list(connection: &SqlConnection) -> Result<Vec<ObtainedUserPayType>, ElogError> {
         user_pay_type
-            .load::<UserPayType>(connection)
+            .select((
+                user_pay_type::id,
+                user_pay_type::name,
+                user_pay_type::bank_name,
+                user_pay_type::description
+            ))
+            .load::<ObtainedUserPayType>(connection)
             .map_err(|error| { ElogError::ErrorRetrievingData(error.to_string()) })
     }
 }

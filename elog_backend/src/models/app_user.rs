@@ -35,6 +35,7 @@ pub struct NewAppUser {
     pub password: String
 }
 
+// Struct to allow send app user data for future login
 #[derive(Debug, Insertable, Serialize, Deserialize)]
 #[table_name = "app_user"]
 pub struct LoginAppUser {
@@ -42,6 +43,7 @@ pub struct LoginAppUser {
     pub password: String
 }
 
+// Struct to show logged app user as a response with the token type and jwt token
 #[derive(Debug, Serialize)]
 pub struct AppUserToken {
     pub token_type: String,
@@ -78,6 +80,13 @@ impl AppUser {
 
     pub fn logout(connection: &SqlConnection, string_token: &str) -> Result<usize, ElogError> {
         Claims::invalidate_token(connection, string_token)
+    }
+
+    pub fn get_app_user_data(connection: &SqlConnection, app_user_id: i16) -> Result<AppUser, ElogError> {
+        app_user
+            .filter(id.eq(app_user_id))
+            .get_result(connection)
+            .map_err(|_| { ElogError::ObjectNotFound(app_user_id.to_string()) })
     }
 }
 

@@ -216,7 +216,6 @@ Response
 [
   {
     "id": 1,
-    "user_id": 1,
     "name": "Credit Card",
     "bank_name": "Awesome Bank",
     "description": "Credit Card"
@@ -259,7 +258,6 @@ Response
 [
   {
     "id": 1,
-    "user_id": 1,
     "category": "Category Name",
     "description": "Category Description"
   }
