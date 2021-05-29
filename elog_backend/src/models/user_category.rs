@@ -29,6 +29,7 @@ pub struct NewUserCategory {
     pub description: String
 }
 
+// Default implementation, lets send JSON body without user_id
 impl Default for NewUserCategory {
     fn default() -> Self {
         NewUserCategory {
@@ -37,6 +38,14 @@ impl Default for NewUserCategory {
             description: String::from("")
         }
     }
+}
+
+// This Struct is only for showing data on endpoint
+#[derive(Queryable, Serialize)]
+pub struct ObtainedUserCategory {
+    pub id: i16,
+    pub category: String,
+    pub description: String
 }
 
 impl UserCategory {
@@ -54,10 +63,15 @@ impl UserCategory {
     pub fn get_list(
         connection: &SqlConnection,
         logged_user_id: i16
-    ) -> Result<Vec<UserCategory>, ElogError> {
+    ) -> Result<Vec<ObtainedUserCategory>, ElogError> {
         user_category
             .filter(user_id.eq(logged_user_id))
-            .load::<UserCategory>(connection)
+            .select((
+                user_category::id,
+                user_category::category,
+                user_category::description
+            ))
+            .load::<ObtainedUserCategory>(connection)
             .map_err(|error| { ElogError::ObjectNotFound(error.to_string()) })
     }
 }

@@ -35,6 +35,7 @@ pub struct NewAppUser {
     pub password: String
 }
 
+// Struct to allow send app user data for future login
 #[derive(Debug, Insertable, Serialize, Deserialize)]
 #[table_name = "app_user"]
 pub struct LoginAppUser {
@@ -42,6 +43,7 @@ pub struct LoginAppUser {
     pub password: String
 }
 
+// Struct to show logged app user as a response with the token type and jwt token
 #[derive(Debug, Serialize)]
 pub struct AppUserToken {
     pub token_type: String,
