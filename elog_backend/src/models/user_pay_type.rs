@@ -2,6 +2,7 @@ use serde::{Deserialize, Serialize};
 use crate::utils::database_utils::SqlConnection;
 use diesel::{
     insert_into,
+    update,
     delete,
     QueryDsl,
     RunQueryDsl,
@@ -65,6 +66,21 @@ impl UserPayType {
             ))
             .load::<UserPayType>(connection)
             .map_err(|error| { ElogError::ErrorRetrievingData(error.to_string()) })
+    }
+
+    pub fn update(
+        connection: &SqlConnection,
+        user_pay_type_id: i16,
+        new_user_pay_type: NewUserPayType
+    ) -> Result<usize, ElogError> {
+        update(user_pay_type.filter(id.eq(user_pay_type_id)))
+            .set((
+                name.eq(new_user_pay_type.name),
+                bank_name.eq(new_user_pay_type.bank_name),
+                description.eq(new_user_pay_type.description)
+            ))
+            .execute(connection)
+            .map_err(|error| { ElogError::ObjectNotFound(error.to_string()) })
     }
 
     pub fn delete_by_id(connection: &SqlConnection, user_pay_type_id: i16) -> Result<usize, ElogError> {

@@ -3,6 +3,7 @@ use actix_web::{
     web,
     get,
     post,
+    put,
     delete
 };
 use crate::models::user_pay_type::{
@@ -31,6 +32,19 @@ pub async fn get_all_pay_types(
     UserPayType::get_list(&authenticated_request.connection).map(|list| {
         HttpResponse::Ok().json(list)
     })
+}
+
+#[put("/user_pay_type/{user_pay_type_id}")]
+pub async fn update_user_pay_type(
+    authenticated_request: AuthenticatedRequest,
+    dynamic_path: web::Path<(i16,)>,
+    new_user_pay_type: web::Json<NewUserPayType>
+) -> Result<HttpResponse, ElogError> {
+    UserPayType::update(
+        &authenticated_request.connection,
+        dynamic_path.into_inner().0,
+        new_user_pay_type.into_inner()
+    ).map(|_| { HttpResponse::Ok().finish() })
 }
 
 #[delete("/user_pay_type/{user_pay_type_id}")]

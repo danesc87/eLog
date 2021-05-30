@@ -2,6 +2,7 @@ use serde::{Deserialize, Serialize};
 use crate::utils::database_utils::SqlConnection;
 use diesel::{
     insert_into,
+    update,
     delete,
     QueryDsl,
     RunQueryDsl,
@@ -65,6 +66,20 @@ impl UserCategory {
                 user_category::description
             ))
             .load::<UserCategory>(connection)
+            .map_err(|error| { ElogError::ObjectNotFound(error.to_string()) })
+    }
+
+    pub fn update(
+        connection: &SqlConnection,
+        user_category_id: i16,
+        new_user_category: NewUserCategory
+    ) -> Result<usize, ElogError> {
+        update(user_category.filter(id.eq(user_category_id)))
+            .set((
+                category.eq(new_user_category.category),
+                description.eq(new_user_category.description)
+            ))
+            .execute(connection)
             .map_err(|error| { ElogError::ObjectNotFound(error.to_string()) })
     }
 
