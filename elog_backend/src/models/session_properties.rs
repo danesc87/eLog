@@ -43,13 +43,18 @@ impl SessionProperties {
         token: &str,
         properties: &mut Map<String, Value>
     ) {
-        properties.insert(String::from("version"), Value::String(String::from("0.99b")));
-        properties.insert(String::from("userData"), Value::Object(Self::get_app_user_data(connection, token)));
+        match Claims::decode_token(token) {
+            Ok(token_data) => {
+                let claims = token_data.claims;
+                properties.insert(String::from("version"), Value::String(String::from("0.99b")));
+                properties.insert(String::from("userData"), Value::Object(Self::get_app_user_data(connection, &claims)));
+            },
+            Err(_) => (),
+        }
     }
 
-    fn get_app_user_data(connection: &SqlConnection, token: &str) -> Map<String, Value>  {
+    fn get_app_user_data(connection: &SqlConnection, claims: &Claims) -> Map<String, Value>  {
         use super::app_user::AppUser;
-        let claims = Claims::decode_token(token).unwrap().claims;
         let app_user = AppUser::get_app_user_data(connection, claims.id).unwrap();
         let mut app_user_map = Map::new();
         app_user_map.insert(String::from("firstName"), Value::String(app_user.first_name));

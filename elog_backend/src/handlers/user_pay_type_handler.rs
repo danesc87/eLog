@@ -15,7 +15,7 @@ use crate::utils::error_mapper::ElogError;
 use crate::authentication::AuthenticatedRequest;
 
 #[post("/user_pay_type")]
-pub async fn insert_pay_type (
+pub async fn insert_user_pay_type (
     authenticated_request: AuthenticatedRequest,
     mut new_user_pay_type: web::Json<NewUserPayType>
 ) -> Result<HttpResponse, ElogError> {
@@ -26,7 +26,7 @@ pub async fn insert_pay_type (
 }
 
 #[get("/user_pay_type")]
-pub async fn get_all_pay_types(
+pub async fn get_all_user_pay_types(
     authenticated_request: AuthenticatedRequest
 ) -> Result<HttpResponse, ElogError> {
     UserPayType::get_list(&authenticated_request.connection).map(|list| {
