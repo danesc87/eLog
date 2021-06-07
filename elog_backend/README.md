@@ -116,11 +116,11 @@ Body
 
 ```json
 {
-	"first_name": "Jon",
-	"last_name": "Doe",
-	"username": "jd",
-	"email": "jd@test.rs",
-	"password": "1234abcd"
+  "first_name": "Jon",
+  "last_name": "Doe",
+  "username": "jd",
+  "email": "jd@test.rs",
+  "password": "1234abcd"
 }
 ```
 
@@ -136,8 +136,8 @@ Body
 
 ```json
 {
-	"username": "dc",
-	"password": "1234abcd"
+  "username": "jd",
+  "password": "1234abcd"
 }
 ```
 
@@ -164,23 +164,45 @@ Request
 ```
 path: /session_properties
 method: GET
-headers: Bearer token or not Token
+headers: Bearer token
 ```
 
 Response
 
 Always Ok with following body
 
-```
+```json
 {
   "is_valid_token": false,
   "properties": null
 }
 ```
-> `properties` will be null if no token was provided or token is expired.
+> `properties` will be null or empty if no token was provided or token is expired.
 > only will have data if token is valid and user has properties
 
-#### insert_pay_type
+#### settings
+
+Request
+
+```
+path: /settings
+method: PUT
+headers: Bearer token
+```
+
+Body
+
+```json
+{
+  "first_name": "Jon",
+  "last_name": "Doe",
+  "username": "jd",
+  "email": "jd@test.rs",
+  "password": "123456abcd"
+}
+```
+
+#### insert_user_pay_type
 
 Request
 
@@ -200,7 +222,7 @@ Body
 }
 ```
 
-#### get_pay_types
+#### get_all_user_pay_types
 
 Request
 
@@ -221,6 +243,36 @@ Response
     "description": "Credit Card"
   }
 ]
+```
+
+#### update_user_pay_type
+
+Request
+
+```
+path: /user_pay_type/{user_pay_type_id}
+method: PUT
+headers: Bearer token
+```
+
+Body
+
+```json
+{
+  "name": "Credit Card",
+  "bank_name": "Awesome Bank",
+  "description": "Credit Card"
+}
+```
+
+#### delete_user_pay_type
+
+Request
+
+```
+path: /user_pay_type/{user_pay_type_id}
+method: DELETE
+headers: Bearer token
 ```
 
 #### insert_user_category
@@ -262,6 +314,35 @@ Response
     "description": "Category Description"
   }
 ]
+```
+
+#### update_user_category
+
+Request
+
+```
+path: /user_category/{user_category_id}
+method: PUT
+headers: Bearer token
+```
+
+Body
+
+```json
+{
+  "category": "Category Name",
+  "description": "Category Description"
+}
+```
+
+#### delete_user_category
+
+Request
+
+```
+path: /user_category/{user_category_id}
+method: DELETE
+headers: Bearer token
 ```
 
 #### insert_expense
@@ -314,6 +395,16 @@ Response
     "register_date": "2020-12-01T23:45:47"
   }
 ]
+```
+
+#### delete_expense
+
+Request
+
+```
+path: /expense/{expense_id}
+method: DELETE
+headers: Bearer token
 ```
 
 #### get_expenses_for_report

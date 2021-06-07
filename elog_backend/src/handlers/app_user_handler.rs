@@ -3,7 +3,8 @@ use actix_web::{
     HttpResponse,
     web,
     get,
-    post
+    post,
+    put
 };
 use crate::utils::database_utils::{
     SqlPool,
@@ -74,4 +75,16 @@ pub async fn session_properties(
         },
         None => HttpResponse::Ok().json(SessionProperties::no_token_session_properties())
     }
+}
+
+#[put("/settings")]
+pub async fn update_app_user(
+    authenticated_request: AuthenticatedRequest,
+    app_user: web::Json<NewAppUser>
+) -> Result<HttpResponse, ElogError> {
+    AppUser::update(
+        &authenticated_request.connection,
+        authenticated_request.user_id,
+        app_user.into_inner()
+    ).map(|_| { HttpResponse::Ok().finish() })
 }

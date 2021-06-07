@@ -2,6 +2,7 @@ use serde::{Deserialize, Serialize};
 use crate::utils::database_utils::SqlConnection;
 use diesel::{
     insert_into,
+    delete,
     QueryDsl,
     RunQueryDsl,
     ExpressionMethods
@@ -91,5 +92,11 @@ impl Expense {
             ))
             .load::<ExpenseWithCategoriesAndPayTypes>(connection)
             .map_err(|_| { ElogError::ObjectNotFound(logged_user_id.to_string()) })
+    }
+
+    pub fn delete_by_id(connection: &SqlConnection, expense_id: i32) -> Result<usize, ElogError> {
+        delete(expense.filter(id.eq(expense_id)))
+            .execute(connection)
+            .map_err(|error| { ElogError::ObjectNotFound(error.to_string()) })
     }
 }

@@ -1,8 +1,9 @@
 use serde::{Deserialize, Serialize};
 use crate::utils::database_utils::SqlConnection;
 use diesel::{
-    QueryDsl,
     insert_into,
+    update,
+    QueryDsl,
     RunQueryDsl,
     ExpressionMethods
 };
@@ -87,6 +88,24 @@ impl AppUser {
             .filter(id.eq(app_user_id))
             .get_result(connection)
             .map_err(|_| { ElogError::ObjectNotFound(app_user_id.to_string()) })
+    }
+
+    pub fn update(
+        connection: &SqlConnection,
+        app_user_id: i16,
+        update_app_user: NewAppUser
+    ) -> Result<usize, ElogError> {
+        use data_encoding::BASE64;
+        update(app_user.filter(id.eq(app_user_id)))
+            .set((
+                first_name.eq(update_app_user.first_name),
+                last_name.eq(update_app_user.last_name),
+                username.eq(update_app_user.username),
+                email.eq(update_app_user.email),
+                password.eq(BASE64.encode(update_app_user.password.as_bytes()))
+            ))
+            .execute(connection)
+            .map_err(|error| { ElogError::ObjectNotFound(error.to_string()) })
     }
 }
 
